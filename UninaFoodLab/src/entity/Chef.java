@@ -48,7 +48,7 @@ public class Chef extends Utente{
     public void rimuoviNotifica(Notifica n) {
         notifiche.remove(n);
     }
-    
+   
 
     public List<Notifica> getNotifiche() {
         return notifiche;

@@ -45,7 +45,7 @@ public class Allievo extends Utente{
         }
         return false;
     }
-    
+   
 
     @Override
     public String toString() {
