@@ -18,6 +18,7 @@ public class DBConnection {
                 String user = "postgres";
                 String password = "$Tortellino27";
 
+                
                 // Carica il driver
                 Class.forName("org.postgresql.Driver");
 
