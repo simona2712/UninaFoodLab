@@ -33,14 +33,26 @@ public abstract class Utente {
     	return email; 
     }
     
+    public String getNumeroTelefono() { 
+    	return numeroTelefono; 
+    }
+    
     public String getFullName() {
         return nome + " " + cognome;
+    }
+    
+    public String getPassword() {
+        return password;
     }
     
     public void setPassword(String nuovaPassword) {
         if (nuovaPassword != null && !nuovaPassword.isBlank()) {
             this.password = nuovaPassword;
         }
+    }
+    
+    public void setId(int id) {
+        this.id = id;
     }
 
     public boolean autentica(String passwordInserita) {
