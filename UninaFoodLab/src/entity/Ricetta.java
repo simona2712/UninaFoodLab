@@ -101,7 +101,7 @@ public class Ricetta {
         }
         return false;
     }
-    
+   
     
     public double getQuantitaTotale() {
         double totale = 0;

@@ -70,4 +70,3 @@ public class Ingrediente {
                " | Calorie: " + calorie + " kcal/100g";
     }
 }
-

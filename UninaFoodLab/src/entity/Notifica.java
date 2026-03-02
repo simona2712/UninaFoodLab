@@ -43,7 +43,6 @@ public class Notifica {
     public Corso getCorso() { 
         return corso; 
     }
-   
 
     public boolean isGenerale() { 
         return corso == null; 
