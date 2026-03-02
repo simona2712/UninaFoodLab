@@ -15,8 +15,8 @@ public class DBConnection {
             try {
                 // Parametri di connessione
                 String url = "jdbc:postgresql://localhost:5432/uninafoodlab";
-                String user = "tuo_utente";
-                String password = "tua_password";
+                String user = "postgres";
+                String password = "$Tortellino27";
 
                 // Carica il driver
                 Class.forName("org.postgresql.Driver");
