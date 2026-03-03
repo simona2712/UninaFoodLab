@@ -26,7 +26,11 @@ public class Adesione {
     
     public int getId() { 
     	return id; 
-   }
+    }
+    
+    public void setId(int id) {
+    	this.id=id;
+    }
 
     public boolean isPresenza() { 
     	return presenza;
@@ -34,6 +38,10 @@ public class Adesione {
 
     public LocalDate getDataAdesione() { 
     	return dataAdesione; 
+    }
+    
+    public void setDataAdesione(LocalDate dataAdesione) {
+    	this.dataAdesione=dataAdesione;
     }
 
     public Allievo getAllievo() { 

@@ -27,13 +27,25 @@ public class Notifica {
     public int getId() { 
         return id; 
     }
+    
+    public void setId(int id) {
+    	this.id=id;
+    }
 
     public String getTesto() {
         return testo; 
     }
+    
+    public void setTesto(String testo) {
+    	this.testo=testo;
+    }
 
     public LocalDate getDataCreazione() { 
         return dataCreazione; 
+    }
+    
+    public void setDataCreazione(LocalDate dataCreazione) {
+    	this.dataCreazione=dataCreazione;
     }
 
     public Chef getChef() { 

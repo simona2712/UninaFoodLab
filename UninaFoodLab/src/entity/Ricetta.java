@@ -25,17 +25,33 @@ public class Ricetta {
     public int getId() { 
     	return id; 
     }
+    
+    public void setId(int id) {
+    	this.id=id;
+    }
 
     public int getDurata() { 
     	return durata; 
+    }
+    
+    public void setDurata(int durata) {
+    	this.durata=durata;
     }
 
     public String getDescrizione() { 
     	return descrizione; 
     }
+    
+    public void setDescrizione(String descrizione) {
+    	this.descrizione=descrizione;
+    }
 
     public String getPreparazione() { 
     	return preparazione; 
+    }
+    
+    public void setPreparazione(String preparazione) {
+    	this.preparazione=preparazione;
     }
 
     
@@ -43,8 +59,16 @@ public class Ricetta {
         return allergeni;
     }
     
+    public void setAllergeni(List<String> allergeni) {
+    	this.allergeni=allergeni;
+    }
+    
     public List<Utilizzo> getIngredienti() { 
     	return ingredienti; 
+    }
+    
+    public void setIngredienti(List<Utilizzo> ingredienti) {
+    	this.ingredienti=ingredienti;
     }
 
     

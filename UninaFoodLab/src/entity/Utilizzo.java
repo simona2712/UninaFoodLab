@@ -22,12 +22,24 @@ public class Utilizzo {
     	return quantita;
     }
     
+    public void setQuantita(double quantita) {
+    	this.quantita=quantita;
+    }
+    
     public String getUnitaMisura() {
     	return unitaMisura;
+    }
+    
+    public void setUnitaMisura(String unitaMisura) {
+    	this.unitaMisura=unitaMisura;
     }
 
     public Ingrediente getIngrediente() { 
     	return ingrediente; 
+    }
+    
+    public void setIngrediente(Ingrediente ingrediente) {
+    	this.ingrediente=ingrediente;
     }
     
     public double calcolaCalorie() {

@@ -23,6 +23,14 @@ public class Allievo extends Utente{
     public List<Corso> getCorsiSeguiti() { 
         return corsiSeguiti; 
     }
+    
+    public String getLivelloAbilita() {
+    	return livelloAbilita;
+    }
+    
+    public void setLivelloAbilita(String livelloAbilita) { 
+    	this.livelloAbilita = livelloAbilita; 
+    }
 
     public void iscriviACorso(Corso corso) {
         corsiSeguiti.add(corso);

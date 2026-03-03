@@ -32,17 +32,33 @@ public class SessionePratica extends Sessione{
     public int getMaxPartecipanti() {
         return maxPartecipanti;
     }
+    
+    public void setMaxPartecipanti(int maxPartecipanti) { 
+    	this.maxPartecipanti = maxPartecipanti; 
+    }
 
     public String getLaboratorio() {
         return laboratorio;
+    }
+    
+    public void setLaboratorio(String laboratorio) { 
+    	this.laboratorio = laboratorio; 
     }
 
     public String getUtensili() {
         return utensili;
     }
     
+    public void setUtensili(String utensili) { 
+    	this.utensili = utensili; 
+    }
+    
     public String getStato() {
         return stato;
+    }
+    
+    public void setStato(String stato) { 
+    	this.stato = stato; 
     }
     
     public boolean isPiena() {

@@ -57,6 +57,10 @@ public abstract class Sessione {
     	this.corso = corso; 
     }
     
+    public void setId(int id) { 
+    	this.id = id; 
+    }
+    
     public boolean isFutura() {
         return data.isAfter(LocalDate.now());
     }
