@@ -24,9 +24,17 @@ public class SessionePratica extends Sessione{
     public List<Ricetta> getRicette() {
         return ricette;
     }
+    
+    public void setRicette(List<Ricetta> ricette) {
+    	this.ricette=ricette;
+    }
 
     public List<Adesione> getAdesioni() {
         return adesioni;
+    }
+    
+    public void setAdesioni(List<Adesione> adesioni) { 
+    	this.adesioni = adesioni; 
     }
 
     public int getMaxPartecipanti() {

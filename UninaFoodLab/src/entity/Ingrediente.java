@@ -47,6 +47,10 @@ public class Ingrediente {
     public String getTipologiaConservazione() { 
         return tipologiaConservazione; 
     }
+    
+    public void setTipologiaConservazione(String tipologia) { 
+    	this.tipologiaConservazione = tipologia; 
+    }
 
     public LocalDate getDataScadenza() { 
         return dataScadenza; 

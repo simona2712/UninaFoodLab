@@ -54,6 +54,11 @@ public abstract class Utente {
     public void setId(int id) {
         this.id = id;
     }
+    
+    public void setNome(String nome) { this.nome = nome; }
+    public void setCognome(String cognome) { this.cognome = cognome; }
+    public void setNumeroTelefono(String numeroTelefono) { this.numeroTelefono = numeroTelefono; }
+    public void setEmail(String email) { this.email = email; }
 
     public boolean autentica(String passwordInserita) {
     	return password != null && password.equals(passwordInserita);

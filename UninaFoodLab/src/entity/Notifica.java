@@ -55,6 +55,14 @@ public class Notifica {
     public Corso getCorso() { 
         return corso; 
     }
+    
+    public void setChef(Chef chef) { 
+    	this.chef = chef; 
+    }
+    
+    public void setCorso(Corso corso) { 
+    	this.corso = corso; 
+    }
 
     public boolean isGenerale() { 
         return corso == null; 

@@ -106,6 +106,13 @@ public class Corso {
         this.chef = chef;
     }
     
+    public void setNome(String nome) { this.nome = nome; }
+    public void setArgomento(String argomento) { this.argomento = argomento; }
+    public void setDataInizio(LocalDate dataInizio) { this.dataInizio = dataInizio; }
+    public void setDataFine(LocalDate dataFine) { this.dataFine = dataFine; }
+    public void setFrequenza(String frequenza) { this.frequenza = frequenza; }
+    public void setSessioni(List<Sessione> sessioni) { this.sessioni = sessioni; }
+    
     public boolean isInCorso() {
         LocalDate oggi = LocalDate.now();
         return !oggi.isBefore(dataInizio) && !oggi.isAfter(dataFine);

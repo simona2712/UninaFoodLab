@@ -21,13 +21,25 @@ public class Chef extends Utente{
     public List<Corso> getCorsi() { 
         return corsi; 
     }
+    
+    public void setCorsi(List<Corso> corsi) { 
+    	this.corsi = corsi; 
+    }
 
     public String getSpecializzazione() { 
         return specializzazione; 
     }
+    
+    public void setSpecializzazione(String specializzazione) { 
+    	this.specializzazione = specializzazione; 
+    }
 
     public int getAnniEsperienza() { 
         return anniEsperienza; 
+    }
+    
+    public void setAnniEsperienza(int anniEsperienza) { 
+    	this.anniEsperienza = anniEsperienza; 
     }
 
     public void aggiungiCorso(Corso corso) {
@@ -52,6 +64,10 @@ public class Chef extends Utente{
 
     public List<Notifica> getNotifiche() {
         return notifiche;
+    }
+    
+    public void setNotifiche(List<Notifica> notifiche) { 
+    	this.notifiche = notifiche; 
     }
 
     @Override

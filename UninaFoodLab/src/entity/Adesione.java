@@ -35,6 +35,10 @@ public class Adesione {
     public boolean isPresenza() { 
     	return presenza;
     }
+    
+    public void setPresenza(boolean presenza) { 
+    	this.presenza = presenza; 
+    }
 
     public LocalDate getDataAdesione() { 
     	return dataAdesione; 
@@ -47,9 +51,17 @@ public class Adesione {
     public Allievo getAllievo() { 
     	return allievo; 
     }
+    
+    public void setAllievo(Allievo allievo) { 
+    	this.allievo = allievo; 
+    }
 
     public SessionePratica getSessione() { 
     	return sessione; 
+    }
+    
+    public void setSessione(SessionePratica sessione) { 
+    	this.sessione = sessione; 
     }
 
     public void confermaPresenza() { 

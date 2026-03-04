@@ -19,9 +19,17 @@ public class Allievo extends Utente{
     public List<Allergia> getAllergie() { 
         return allergie; 
     }
+    
+    public void setAllergie(List<Allergia> allergie) {
+    	this.allergie=allergie;
+    }
 
     public List<Corso> getCorsiSeguiti() { 
         return corsiSeguiti; 
+    }
+    
+    public void setCorsiSeguiti(List<Corso> corsiSeguiti) {
+    	this.corsiSeguiti=corsiSeguiti;
     }
     
     public String getLivelloAbilita() {
