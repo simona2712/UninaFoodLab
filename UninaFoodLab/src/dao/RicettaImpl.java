@@ -154,4 +154,38 @@ public class RicettaImpl extends GenericImpl implements RicettaDAO{
         }
         return lista;
     }
+    
+    public void associaASessionePratica(int idRicetta, int idSessionePratica) throws SQLException {
+
+        if (idRicetta <= 0 || idSessionePratica <= 0)
+            throw new IllegalArgumentException("ID non validi");
+
+        String checkSql = """
+            SELECT 1 FROM svolge 
+            WHERE fk_ricetta = ? AND fk_sessionepratica = ?
+        """;
+
+        try (PreparedStatement check = getConnection().prepareStatement(checkSql)) {
+
+            check.setInt(1, idRicetta);
+            check.setInt(2, idSessionePratica);
+
+            try (ResultSet rs = check.executeQuery()) {
+                if (rs.next()) {
+                    return;
+                }
+            }
+        }
+
+        String insertSql = """
+            INSERT INTO svolge (fk_ricetta, fk_sessionepratica)
+            VALUES (?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(insertSql)) {
+            ps.setInt(1, idRicetta);
+            ps.setInt(2, idSessionePratica);
+            ps.executeUpdate();
+        }
+    }
 }

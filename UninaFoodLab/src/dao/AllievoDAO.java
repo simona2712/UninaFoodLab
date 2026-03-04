@@ -4,7 +4,7 @@ import entity.Allievo;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface AllievoDAO extends GenericDAO{
+public interface AllievoDAO extends UtenteDAO, GenericDAO{
 	
 	List<Allievo> findAll() throws SQLException;
 	void aggiungiAllergia(int idAllievo, int idAllergia) throws SQLException;

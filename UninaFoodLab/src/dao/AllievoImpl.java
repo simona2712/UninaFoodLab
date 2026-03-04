@@ -156,4 +156,30 @@ public class AllievoImpl extends GenericImpl implements AllievoDAO{
             ps.executeUpdate();
         }
     }
+    
+    public Allievo login(String username, String password) throws SQLException {
+        String sql = "SELECT * FROM allievo WHERE email = ? AND password = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setString(2, password);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                	return new Allievo(
+                            rs.getInt("id_allievo"),
+                            rs.getString("nome"),
+                            rs.getString("cognome"),
+                            rs.getString("numero_telefono"),
+                            rs.getString("email"),
+                            rs.getString("password"),
+                            rs.getString("livello_abilita")
+                        );
+                }
+            }
+        }
+        return null;
+    }
 }
