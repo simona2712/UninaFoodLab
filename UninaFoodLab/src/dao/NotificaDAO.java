@@ -1,5 +1,11 @@
 package dao;
 
-public interface NotificaDAO {
+import entity.Notifica;
+import java.sql.SQLException;
+import java.util.List;
 
+public interface NotificaDAO extends GenericDAO {
+    List<Notifica> findAll() throws SQLException;
+    List<Notifica> findByChef(int idChef) throws SQLException;
+    List<Notifica> findByCorso(int idCorso) throws SQLException;
 }

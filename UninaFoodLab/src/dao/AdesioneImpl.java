@@ -125,15 +125,17 @@ public class AdesioneImpl extends GenericImpl implements AdesioneDAO{
     public int countAdesioniBySessione(int idSessione) throws SQLException {
         String sql = "SELECT COUNT(*) FROM adesione WHERE fk_sessionepratica = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection conn = getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, idSessione);
 
             try (ResultSet rs = ps.executeQuery()) {
-                rs.next();
-                return rs.getInt(1);
+            	if (rs.next()) {
+                    return rs.getInt(1);
+                }
             }
         }
+        return 0;
     }
 }

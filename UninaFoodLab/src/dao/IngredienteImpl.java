@@ -106,4 +106,30 @@ public class IngredienteImpl extends GenericImpl implements IngredienteDAO{
         }
         return lista;
     }
+    
+    public List<Ingrediente> findByNome(String nome) throws SQLException {
+        List<Ingrediente> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM ingrediente WHERE nome ILIKE ? ORDER BY nome ASC";
+
+        Connection conn = getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "%" + nome + "%"); // Cerca ingredienti che contengono la stringa
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ingrediente ing = new Ingrediente(
+                        rs.getInt("id_ingrediente"),
+                        rs.getString("nome"),
+                        rs.getString("tipologia_conservazione"),
+                        rs.getDate("data_scadenza").toLocalDate(),
+                        rs.getDouble("calorie")
+                    );
+                    lista.add(ing);
+                }
+            }
+        }
+        return lista;
+    }
 }

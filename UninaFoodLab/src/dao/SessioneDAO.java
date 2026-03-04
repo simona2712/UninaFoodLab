@@ -1,5 +1,5 @@
 package dao;
 
-public interface SessioneDAO {
+public interface SessioneDAO extends GenericDAO{
 
 }

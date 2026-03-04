@@ -125,12 +125,12 @@ public class CorsoImpl extends GenericImpl implements CorsoDAO{
     
     public List<Corso> findByArgomento(String argomento) throws SQLException {
         List<Corso> lista = new ArrayList<>();
-        String sql = "SELECT * FROM corso WHERE argomento = ?";
+        String sql = "SELECT * FROM corso WHERE argomento ILIKE ? ORDER BY titolo ASC";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        Connection conn = getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, argomento);
+            ps.setString(1,"%" + argomento + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
                 ChefImpl chefDAO = new ChefImpl();

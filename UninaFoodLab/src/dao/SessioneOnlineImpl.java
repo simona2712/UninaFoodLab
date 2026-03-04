@@ -138,4 +138,35 @@ public class SessioneOnlineImpl extends GenericImpl implements SessioneOnlineDAO
            }
            return lista;
     	}
+    
+    public List<SessioneOnline> findByCorso(int idCorso) throws SQLException {
+        List<SessioneOnline> lista = new ArrayList<>();
+        String sql = "SELECT * FROM sessione_online WHERE fk_corso = ? ORDER BY data ASC, ora ASC";
+
+        CorsoDAO corsoDAO = new CorsoImpl();
+        Corso corso = (Corso) corsoDAO.read(idCorso);
+
+        if (corso == null) return lista;
+
+        Connection conn = getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCorso);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    SessioneOnline s = new SessioneOnline(
+                        rs.getInt("id_sessioneonline"),
+                        rs.getInt("durata"),
+                        rs.getDate("data").toLocalDate(),
+                        rs.getTime("ora").toLocalTime(),
+                        corso,
+                        rs.getString("link_riunione"),
+                        rs.getInt("max_partecipanti")
+                    );
+                    lista.add(s);
+                }
+            }
+        }
+        return lista;
+    }
 }
