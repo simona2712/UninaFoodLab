@@ -3,43 +3,33 @@ package database;
 import java.sql.*;
 
 public class DBConnection {
-	
-	private static Connection connection = null;
-	
-	private DBConnection() {
-		// Costruttore privato: impedisce istanziazione
-    }
-	
-	public static Connection getConnection() throws SQLException {
+    private static Connection connection = null;
+
+    private DBConnection() {}
+
+    public static synchronized Connection getConnection() throws SQLException {
+        // Se la connessione non esiste o è stata chiusa, la riapriamo
         if (connection == null || connection.isClosed()) {
+            String url = "jdbc:postgresql://localhost:5432/uninafoodlab";
+            String user = "postgres";
+            String password = "$Tortellino27";
+
             try {
-                // Parametri di connessione
-                String url = "jdbc:postgresql://localhost:5432/uninafoodlab";
-                String user = "postgres";
-                String password = "$Tortellino27";
-
-                // Carica il driver
-                Class.forName("org.postgresql.Driver");
-
-                // Crea la connessione
                 connection = DriverManager.getConnection(url, user, password);
-
-            } catch (ClassNotFoundException e) {
-                System.err.println("Driver JDBC non trovato");
-                e.printStackTrace();
             } catch (SQLException e) {
-                System.err.println("Errore nella connessione al DB");
-                e.printStackTrace();
+                System.err.println("Errore di connessione al database!");
                 throw e;
             }
         }
         return connection;
     }
 
+    // Metodo da chiamare SOLO quando chiudi definitivamente l'app
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
+                System.out.println("Connessione al DB chiusa con successo.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
