@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import entity.Ricetta;
 
-public class RicettaImpl extends GenericImpl {
+public class RicettaImpl extends GenericImpl implements RicettaDAO{
 
     @Override
     public void create(Object o) throws SQLException {

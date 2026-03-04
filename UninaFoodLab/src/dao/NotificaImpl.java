@@ -7,7 +7,7 @@ import entity.Notifica;
 import entity.Chef;
 import entity.Corso;
 
-public class NotificaImpl extends GenericImpl {
+public class NotificaImpl extends GenericImpl implements NotificaDAO{
 	private ChefImpl chefDAO = new ChefImpl();
     private CorsoImpl corsoDAO = new CorsoImpl();
 

@@ -7,7 +7,7 @@ import java.util.List;
 import entity.Corso;
 import entity.Chef;
 
-public class CorsoImpl extends GenericImpl {
+public class CorsoImpl extends GenericImpl implements CorsoDAO{
 
     @Override
     public void create(Object o) throws SQLException {

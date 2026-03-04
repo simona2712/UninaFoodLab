@@ -6,7 +6,7 @@ import java.util.List;
 
 import entity.*;
 
-public class AllievoImpl extends GenericImpl {
+public class AllievoImpl extends GenericImpl implements AllievoDAO{
 
     @Override
     public void create(Object o) throws SQLException {

@@ -7,7 +7,7 @@ import entity.Adesione;
 import entity.Allievo;
 import entity.SessionePratica;
 
-public class AdesioneImpl extends GenericImpl {
+public class AdesioneImpl extends GenericImpl implements AdesioneDAO{
 
     @Override
     public void create(Object o) throws SQLException {

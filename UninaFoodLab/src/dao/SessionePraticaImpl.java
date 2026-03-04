@@ -6,7 +6,7 @@ import java.util.List;
 import entity.*;
 
 
-public class SessionePraticaImpl extends GenericImpl {
+public class SessionePraticaImpl extends GenericImpl implements SessionePraticaDAO{
 
     @Override
     public void create(Object o) throws SQLException {

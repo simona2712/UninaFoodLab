@@ -6,7 +6,7 @@ import java.util.List;
 import entity.*;
 
 
-public class ChefImpl extends GenericImpl {
+public class ChefImpl extends GenericImpl implements ChefDAO{
 
     @Override
     public void create(Object o) throws SQLException {

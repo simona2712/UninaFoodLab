@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import entity.Ingrediente;
 
-public class IngredienteImpl extends GenericImpl {
+public class IngredienteImpl extends GenericImpl implements IngredienteDAO{
 
     @Override
     public void create(Object o) throws SQLException {

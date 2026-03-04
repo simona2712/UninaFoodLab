@@ -1,5 +1,5 @@
 package dao;
 
-public abstract class SessioneImpl extends GenericImpl{
+public abstract class SessioneImpl extends GenericImpl implements SessioneDAO{
 
 }
