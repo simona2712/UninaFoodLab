@@ -6,7 +6,7 @@ import java.util.List;
 import entity.Allergia;
 
 
-public class AllergiaDAO extends GenericDAO {
+public class AllergiaImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {

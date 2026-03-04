@@ -6,7 +6,7 @@ import java.util.List;
 
 import entity.*;
 
-public class AllievoDAO extends GenericDAO {
+public class AllievoImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {
@@ -60,10 +60,10 @@ public class AllievoDAO extends GenericDAO {
                             rs.getString("livello_abilita")
                     );
 
-                    AllergiaDAO allergiaDAO = new AllergiaDAO();
+                    AllergiaImpl allergiaDAO = new AllergiaImpl();
                     a.setAllergie(allergiaDAO.findByAllievo(id));
 
-                    CorsoDAO corsoDAO = new CorsoDAO();
+                    CorsoImpl corsoDAO = new CorsoImpl();
                     a.setCorsiSeguiti(corsoDAO.findCorsiByAllievo(id));
 
                     return a;

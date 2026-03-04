@@ -6,7 +6,7 @@ import java.util.List;
 import entity.*;
 
 
-public class SessioneOnlineDAO extends GenericDAO {
+public class SessioneOnlineImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {
@@ -51,7 +51,7 @@ public class SessioneOnlineDAO extends GenericDAO {
 
             if (rs.next()) {
 
-                CorsoDAO corsoDAO = new CorsoDAO();
+                CorsoImpl corsoDAO = new CorsoImpl();
                 Corso corso = corsoDAO.read(rs.getInt("fk_corso"));
 
                 return new SessioneOnline(
@@ -113,7 +113,7 @@ public class SessioneOnlineDAO extends GenericDAO {
 
         String sql = "SELECT * FROM sessione_online";
         
-        CorsoDAO corsoDAO = new CorsoDAO();
+        CorsoImpl corsoDAO = new CorsoImpl();
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {

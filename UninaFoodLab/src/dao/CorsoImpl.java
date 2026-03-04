@@ -7,7 +7,7 @@ import java.util.List;
 import entity.Corso;
 import entity.Chef;
 
-public class CorsoDAO extends GenericDAO {
+public class CorsoImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {
@@ -44,7 +44,7 @@ public class CorsoDAO extends GenericDAO {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                ChefDAO chefDAO = new ChefDAO();
+                ChefImpl chefDAO = new ChefImpl();
                 Chef chef = chefDAO.read(rs.getInt("fk_chef"));
 
                 return new Corso(
@@ -100,7 +100,7 @@ public class CorsoDAO extends GenericDAO {
         List<Corso> lista = new ArrayList<>();
         String sql = "SELECT * FROM corso";
         
-        ChefDAO chefDAO = new ChefDAO();
+        ChefImpl chefDAO = new ChefImpl();
         
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -133,7 +133,7 @@ public class CorsoDAO extends GenericDAO {
             ps.setString(1, argomento);
 
             try (ResultSet rs = ps.executeQuery()) {
-                ChefDAO chefDAO = new ChefDAO();
+                ChefImpl chefDAO = new ChefImpl();
 
                 while (rs.next()) {
                     Chef chef = chefDAO.read(rs.getInt("fk_chef"));
@@ -165,7 +165,7 @@ public class CorsoDAO extends GenericDAO {
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, idAllievo);
             try (ResultSet rs = ps.executeQuery()) {
-                ChefDAO chefDAO = new ChefDAO();
+                ChefImpl chefDAO = new ChefImpl();
 
                 while (rs.next()) {
                     

@@ -7,7 +7,7 @@ import entity.Adesione;
 import entity.Allievo;
 import entity.SessionePratica;
 
-public class AdesioneDAO extends GenericDAO {
+public class AdesioneImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {
@@ -37,7 +37,7 @@ public class AdesioneDAO extends GenericDAO {
     @Override
     public Adesione read(int id) throws SQLException {
         String sql = "SELECT * FROM adesione WHERE id_adesione = ?";
-        AllievoDAO allievoDAO = new AllievoDAO();
+        AllievoImpl allievoDAO = new AllievoImpl();
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -46,7 +46,7 @@ public class AdesioneDAO extends GenericDAO {
                     
                     Allievo allievo = allievoDAO.read(rs.getInt("fk_allievo"));
 
-                    SessionePraticaDAO sessioneDAO = new SessionePraticaDAO();
+                    SessionePraticaImpl sessioneDAO = new SessionePraticaImpl();
                     SessionePratica sessione = sessioneDAO.read(rs.getInt("fk_sessionepratica"));
 
                     Adesione ade = new Adesione(
@@ -96,8 +96,8 @@ public class AdesioneDAO extends GenericDAO {
         List<Adesione> lista = new ArrayList<>();
         String sql = "SELECT * FROM adesione";
 
-        AllievoDAO allievoDAO = new AllievoDAO();
-        SessionePraticaDAO sessioneDAO = new SessionePraticaDAO();
+        AllievoImpl allievoDAO = new AllievoImpl();
+        SessionePraticaImpl sessioneDAO = new SessionePraticaImpl();
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

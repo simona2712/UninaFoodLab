@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import entity.Ricetta;
 
-public class RicettaDAO extends GenericDAO {
+public class RicettaImpl extends GenericImpl {
 
     @Override
     public void create(Object o) throws SQLException {
@@ -34,7 +34,7 @@ public class RicettaDAO extends GenericDAO {
                 }
             }
         }
-        UtilizzoDAO uDAO = new UtilizzoDAO();
+        UtilizzoImpl uDAO = new UtilizzoImpl();
         for (entity.Utilizzo u : r.getIngredienti()) {
             uDAO.create(r.getId(), u);
         }
@@ -64,7 +64,7 @@ public class RicettaDAO extends GenericDAO {
                         r.setAllergeni(listaAllergeni);
                     }
 
-                    UtilizzoDAO uDAO = new UtilizzoDAO();
+                    UtilizzoImpl uDAO = new UtilizzoImpl();
                     r.setIngredienti(uDAO.findByRicetta(id));
 
                     return r;
@@ -145,7 +145,7 @@ public class RicettaDAO extends GenericDAO {
                         rs.getString("preparazione")
                     );
                     
-                    UtilizzoDAO uDAO = new UtilizzoDAO();
+                    UtilizzoImpl uDAO = new UtilizzoImpl();
                     r.setIngredienti(uDAO.findByRicetta(r.getId()));
                     
                     lista.add(r);

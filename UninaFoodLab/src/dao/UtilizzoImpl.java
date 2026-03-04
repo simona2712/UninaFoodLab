@@ -6,7 +6,7 @@ import java.util.List;
 import entity.Utilizzo;
 import entity.Ingrediente;
 
-public class UtilizzoDAO extends GenericDAO {
+public class UtilizzoImpl extends GenericImpl {
 
 
     public void create(int idRicetta, Utilizzo u) throws SQLException {

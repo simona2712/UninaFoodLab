@@ -7,9 +7,9 @@ import entity.Notifica;
 import entity.Chef;
 import entity.Corso;
 
-public class NotificaDAO extends GenericDAO {
-	private ChefDAO chefDAO = new ChefDAO();
-    private CorsoDAO corsoDAO = new CorsoDAO();
+public class NotificaImpl extends GenericImpl {
+	private ChefImpl chefDAO = new ChefImpl();
+    private CorsoImpl corsoDAO = new CorsoImpl();
 
     @Override
     public void create(Object o) throws SQLException {
@@ -51,14 +51,14 @@ public class NotificaDAO extends GenericDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     // Recupero Chef
-                    ChefDAO chefDAO = new ChefDAO();
+                    ChefImpl chefDAO = new ChefImpl();
                     Chef chef = chefDAO.read(rs.getInt("fk_chef"));
 
                     // Recupero Corso (se presente)
                     Corso corso = null;
                     int idCorso = rs.getInt("fk_corso");
                     if (!rs.wasNull()) {
-                        CorsoDAO corsoDAO = new CorsoDAO();
+                        CorsoImpl corsoDAO = new CorsoImpl();
                         corso = corsoDAO.read(idCorso);
                     }
 
@@ -121,8 +121,8 @@ public class NotificaDAO extends GenericDAO {
         List<Notifica> lista = new ArrayList<>();
         String sql = "SELECT * FROM notifica";
 
-        ChefDAO chefDAO = new ChefDAO();
-        CorsoDAO corsoDAO = new CorsoDAO();
+        ChefImpl chefDAO = new ChefImpl();
+        CorsoImpl corsoDAO = new CorsoImpl();
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
