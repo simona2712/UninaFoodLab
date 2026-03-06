@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/img/U_F_L.png</name>
+			<type>1</type>
+			<location>C:/Users/gigli/Desktop/Simona/uni/primo anno/Progetto/U_F_L.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>
