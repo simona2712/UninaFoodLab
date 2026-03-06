@@ -7,10 +7,10 @@ import java.util.List;
 import entity.Corso;
 import entity.Chef;
 
-public class CorsoImpl extends GenericImpl implements CorsoDAO{
+public class CorsoImpl extends GenericImpl<Corso> implements CorsoDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Corso o) throws SQLException {
         if (!(o instanceof Corso)) return;
         Corso c = (Corso) o;
 
@@ -62,7 +62,7 @@ public class CorsoImpl extends GenericImpl implements CorsoDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Corso o) throws SQLException {
         if (!(o instanceof Corso)) return;
         Corso c = (Corso) o;
 

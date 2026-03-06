@@ -6,10 +6,10 @@ import java.util.List;
 import entity.*;
 
 
-public class SessioneOnlineImpl extends GenericImpl implements SessioneOnlineDAO{
+public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements SessioneOnlineDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(SessioneOnline o) throws SQLException {
         if (!(o instanceof SessioneOnline)) return;
         SessioneOnline s = (SessioneOnline) o;
 
@@ -70,7 +70,7 @@ public class SessioneOnlineImpl extends GenericImpl implements SessioneOnlineDAO
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(SessioneOnline o) throws SQLException {
         if (!(o instanceof SessioneOnline)) return;
         SessioneOnline s = (SessioneOnline) o;
 
@@ -167,6 +167,49 @@ public class SessioneOnlineImpl extends GenericImpl implements SessioneOnlineDAO
                 }
             }
         }
+        return lista;
+    }
+    
+    public List<SessioneOnline> findFutureByCorso(int idCorso) throws SQLException {
+
+        List<SessioneOnline> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT * 
+            FROM sessione_online
+            WHERE fk_corso = ?
+            AND data >= CURRENT_DATE
+            ORDER BY data ASC, ora ASC
+        """;
+
+        CorsoDAO corsoDAO = new CorsoImpl();
+        Corso corso = corsoDAO.read(idCorso);
+
+        if (corso == null) return lista;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, idCorso);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    SessioneOnline s = new SessioneOnline(
+                        rs.getInt("id_sessioneonline"),
+                        rs.getInt("durata"),
+                        rs.getDate("data").toLocalDate(),
+                        rs.getTime("ora").toLocalTime(),
+                        corso,
+                        rs.getString("link_riunione"),
+                        rs.getInt("max_partecipanti")
+                    );
+
+                    lista.add(s);
+                }
+            }
+        }
+
         return lista;
     }
 }

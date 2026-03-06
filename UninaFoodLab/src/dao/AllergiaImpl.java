@@ -6,10 +6,10 @@ import java.util.List;
 import entity.Allergia;
 
 
-public class AllergiaImpl extends GenericImpl implements AllergiaDAO{
+public class AllergiaImpl extends GenericImpl<Allergia> implements AllergiaDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Allergia o) throws SQLException {
         if (!(o instanceof Allergia)) return;
         Allergia a = (Allergia) o;
         String sql = "INSERT INTO allergia(nome) VALUES(?)";
@@ -38,7 +38,7 @@ public class AllergiaImpl extends GenericImpl implements AllergiaDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Allergia o) throws SQLException {
         if (!(o instanceof Allergia)) return;
         Allergia a = (Allergia) o;
         String sql = "UPDATE allergia SET nome=? WHERE id_allergia=?";

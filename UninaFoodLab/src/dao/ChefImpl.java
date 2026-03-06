@@ -6,10 +6,10 @@ import java.util.List;
 import entity.*;
 
 
-public class ChefImpl extends GenericImpl implements ChefDAO{
+public class ChefImpl extends GenericImpl<Chef> implements ChefDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Chef o) throws SQLException {
         if (!(o instanceof Chef)) return;
         Chef c = (Chef) o;
 
@@ -67,7 +67,7 @@ public class ChefImpl extends GenericImpl implements ChefDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Chef o) throws SQLException {
         if (!(o instanceof Chef)) return;
         Chef c = (Chef) o;
 

@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import entity.Ricetta;
 
-public class RicettaImpl extends GenericImpl implements RicettaDAO{
+public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Ricetta o) throws SQLException {
         if (!(o instanceof Ricetta r)) return;
 
         String sql = """
@@ -75,7 +75,7 @@ public class RicettaImpl extends GenericImpl implements RicettaDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Ricetta o) throws SQLException {
         if (!(o instanceof Ricetta r)) return;
 
         String sql = """
@@ -185,6 +185,60 @@ public class RicettaImpl extends GenericImpl implements RicettaDAO{
         try (PreparedStatement ps = getConnection().prepareStatement(insertSql)) {
             ps.setInt(1, idRicetta);
             ps.setInt(2, idSessionePratica);
+            ps.executeUpdate();
+        }
+    }
+    
+    public void iscriviSessioneOnline(int idAllievo, int idSessione) throws SQLException {
+
+        String sql = """
+            INSERT INTO adesione (presenza, data_adesione, fk_allievo, fk_sessionepratica)
+            VALUES (?, CURRENT_DATE, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setBoolean(1, false);
+            ps.setInt(2, idAllievo);
+            ps.setInt(3, idSessione);
+
+            ps.executeUpdate();
+        }
+    }
+    
+    public void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException {
+
+        if (idRicetta <= 0 || idIngrediente <= 0)
+            throw new IllegalArgumentException("ID non validi");
+
+        String checkSql = """
+            SELECT 1 FROM utilizzo
+            WHERE fk_ricetta = ? AND fk_ingrediente = ?
+        """;
+
+        try (PreparedStatement check = getConnection().prepareStatement(checkSql)) {
+
+            check.setInt(1, idRicetta);
+            check.setInt(2, idIngrediente);
+
+            try (ResultSet rs = check.executeQuery()) {
+                if (rs.next()) {
+                    return;
+                }
+            }
+        }
+
+        String insertSql = """
+            INSERT INTO utilizzo (fk_ricetta, fk_ingrediente, quantita)
+            VALUES (?, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(insertSql)) {
+
+            ps.setInt(1, idRicetta);
+            ps.setInt(2, idIngrediente);
+            ps.setDouble(3, quantita);
+
             ps.executeUpdate();
         }
     }

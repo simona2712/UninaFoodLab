@@ -6,10 +6,10 @@ import java.util.List;
 import entity.*;
 
 
-public class SessionePraticaImpl extends GenericImpl implements SessionePraticaDAO{
+public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements SessionePraticaDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(SessionePratica o) throws SQLException {
         if (!(o instanceof SessionePratica)) return;
         SessionePratica s = (SessionePratica) o;
 
@@ -76,7 +76,7 @@ public class SessionePraticaImpl extends GenericImpl implements SessionePraticaD
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(SessionePratica o) throws SQLException {
         if (!(o instanceof SessionePratica)) return;
         SessionePratica s = (SessionePratica) o;
 
@@ -152,5 +152,47 @@ public class SessionePraticaImpl extends GenericImpl implements SessionePraticaD
             ps.setInt(2, idRicetta);
             ps.executeUpdate();
         }
+    }
+    
+    public List<SessionePratica> findFutureByCorso(int idCorso) throws SQLException {
+
+        List<SessionePratica> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT * 
+            FROM sessione_pratica
+            WHERE fk_corso = ? AND data > CURRENT_DATE
+            ORDER BY data
+        """;
+
+        CorsoImpl corsoDAO = new CorsoImpl();
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, idCorso);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Corso corso = corsoDAO.read(rs.getInt("fk_corso"));
+
+                    SessionePratica s = new SessionePratica(
+                            rs.getInt("id_sessionepratica"),
+                            rs.getInt("durata"),
+                            rs.getDate("data").toLocalDate(),
+                            rs.getTime("ora").toLocalTime(),
+                            corso,
+                            rs.getInt("max_partecipanti"),
+                            rs.getString("laboratorio"),
+                            rs.getString("utensili")
+                    );
+
+                    lista.add(s);
+                }
+            }
+        }
+
+        return lista;
     }
 }

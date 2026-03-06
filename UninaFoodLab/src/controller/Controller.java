@@ -100,14 +100,14 @@ public class Controller {
         if (corso == null)
             throw new IllegalArgumentException("Corso non valido");
 
-        SessionePratica sessionePratica = new SessionePratica(id, durata, data, ora, corso, max_partecipanti, utensili, laboratorio);
+        SessionePratica sessionePratica = new SessionePratica(id, durata, data, ora, corso, max_partecipanti, laboratorio, utensili);
         sessionePraticaDAO.create(sessionePratica);
     }
     
     public void iscriviAllievoACorso(int idAllievo, int idCorso) throws SQLException {
 
-        Object a = allievoDAO.read(idAllievo);
-        Object c = corsoDAO.read(idCorso);
+        Allievo a = allievoDAO.read(idAllievo);
+        Corso c = corsoDAO.read(idCorso);
 
         if (a == null)
             throw new IllegalArgumentException("Allievo non esistente");
@@ -121,8 +121,8 @@ public class Controller {
     public void associaRicettaASessionePratica(int idRicetta, int idSessione)
             throws SQLException {
 
-        Object r = ricettaDAO.read(idRicetta);
-        Object s = sessionePraticaDAO.read(idSessione);
+        Ricetta r = ricettaDAO.read(idRicetta);
+        SessionePratica s = sessionePraticaDAO.read(idSessione);
 
         if (r == null)
             throw new IllegalArgumentException("Ricetta non trovata");
@@ -139,8 +139,8 @@ public class Controller {
     public void aggiungiAllergiaAAllievo(int idAllievo, int idAllergia)
             throws SQLException {
 
-        Object a = allievoDAO.read(idAllievo);
-        Object all = allergiaDAO.read(idAllergia);
+        Allievo a = allievoDAO.read(idAllievo);
+        Allergia all = allergiaDAO.read(idAllergia);
 
         if (a == null)
             throw new IllegalArgumentException("Allievo non trovato");
@@ -153,17 +153,96 @@ public class Controller {
     
     public int numeroIscrittiCorso(int idCorso) throws SQLException {
 
-        Object c = corsoDAO.read(idCorso);
+        Corso c = corsoDAO.read(idCorso);
         if (c == null)
             throw new IllegalArgumentException("Corso non trovato");
 
-        return adesioneDAO.countByCorso(idCorso);
+        return adesioneDAO.countAdesioniByCorso(idCorso);
     }
     
     public List<SessionePratica> getSessioniPraticheFuture(int idCorso)
             throws SQLException {
 
         return sessionePraticaDAO.findFutureByCorso(idCorso);
+    }
+    
+    public List<Corso> getTuttiCorsi() throws SQLException {
+        return corsoDAO.findAll();
+    }
+    
+    public List<SessioneOnline> getSessioniOnlineCorso(int idCorso) throws SQLException {
+
+        Corso c = corsoDAO.read(idCorso);
+
+        if (c == null)
+            throw new IllegalArgumentException("Corso non trovato");
+
+        return sessioneOnlineDAO.findByCorso(idCorso);
+    }
+    
+    public void iscriviASessioneOnline(int idAllievo, int idSessione) throws SQLException {
+
+        Allievo a = allievoDAO.read(idAllievo);
+        SessioneOnline s = sessioneOnlineDAO.read(idSessione);
+
+        if (a == null)
+            throw new IllegalArgumentException("Allievo non trovato");
+
+        if (s == null)
+            throw new IllegalArgumentException("Sessione non trovata");
+
+        if (s.getData().isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("Sessione già passata");
+
+        adesioneDAO.iscriviSessioneOnline(idAllievo, idSessione);
+    }
+    
+    public List<Ricetta> getRicetteSessione(int idSessione) throws SQLException {
+
+        SessionePratica s = sessionePraticaDAO.read(idSessione);
+
+        if (s == null)
+            throw new IllegalArgumentException("Sessione non trovata");
+
+        return ricettaDAO.findBySessionePratica(idSessione);
+    }
+    
+    
+    public boolean ricettaCompatibileConAllievo(int idRicetta, int idAllievo)
+            throws SQLException {
+
+        List<Ingrediente> ingredienti = ingredienteDAO.findByRicetta(idRicetta);
+        List<Allergia> allergie = allergiaDAO.findByAllievo(idAllievo);
+
+        for (Ingrediente i : ingredienti) {
+            for (Allergia a : allergie) {
+                if (i.getNome().equalsIgnoreCase(a.getNome()))
+                    return false;
+            }
+        }
+
+        return true;
+    }
+    
+    public List<SessioneOnline> getSessioniOnlineFuture(int idCorso)
+            throws SQLException {
+
+        return sessioneOnlineDAO.findFutureByCorso(idCorso);
+    }
+    
+    public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita)
+            throws SQLException {
+
+        Ricetta r = ricettaDAO.read(idRicetta);
+        Ingrediente i = ingredienteDAO.read(idIngrediente);
+
+        if (r == null)
+            throw new IllegalArgumentException("Ricetta non trovata");
+
+        if (i == null)
+            throw new IllegalArgumentException("Ingrediente non trovato");
+
+        ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita);
     }
 
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import entity.Utilizzo;
 import entity.Ingrediente;
 
-public class UtilizzoImpl extends GenericImpl implements UtilizzoDAO{
+public class UtilizzoImpl extends GenericImpl<Utilizzo> implements UtilizzoDAO{
 
 
     public void create(int idRicetta, Utilizzo u) throws SQLException {
@@ -81,7 +81,7 @@ public class UtilizzoImpl extends GenericImpl implements UtilizzoDAO{
     
     
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Utilizzo o) throws SQLException {
         throw new UnsupportedOperationException(
             "Per aggiornare un Utilizzo serve anche l'ID Ricetta. Usa update(int idRicetta, Utilizzo u)"
         );
@@ -101,12 +101,12 @@ public class UtilizzoImpl extends GenericImpl implements UtilizzoDAO{
     }
 
  
-    @Override public void create(Object o) throws SQLException { 
+    @Override public void create(Utilizzo o) throws SQLException { 
     	throw new UnsupportedOperationException(
                 "Errore: Utilizzo non può essere creato da solo. Usa create(int idRicetta, Utilizzo u)"
             );
     }
-    @Override public Object read(int id) throws SQLException { 
+    @Override public Utilizzo read(int id) throws SQLException { 
     	throw new UnsupportedOperationException(
                 "Errore: Utilizzo non ha un ID univoco. Usa findByRicetta(int idRicetta)"
             );

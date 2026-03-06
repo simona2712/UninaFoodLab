@@ -7,10 +7,10 @@ import entity.Adesione;
 import entity.Allievo;
 import entity.SessionePratica;
 
-public class AdesioneImpl extends GenericImpl implements AdesioneDAO{
+public class AdesioneImpl extends GenericImpl<Adesione> implements AdesioneDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Adesione o) throws SQLException {
         if (!(o instanceof Adesione ade)) return;
 
         String sql = """
@@ -69,7 +69,7 @@ public class AdesioneImpl extends GenericImpl implements AdesioneDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Adesione o) throws SQLException {
         if (!(o instanceof Adesione ade)) return;
 
         String sql = "UPDATE adesione SET presenza = ?, data_adesione = ? WHERE id_adesione = ?";
@@ -137,5 +137,46 @@ public class AdesioneImpl extends GenericImpl implements AdesioneDAO{
             }
         }
         return 0;
+    }
+    
+    public int countAdesioniByCorso(int idCorso) throws SQLException {
+
+        String sql = """
+            SELECT COUNT(*)
+            FROM adesione a
+            JOIN sessionepratica sp 
+            ON a.fk_sessionepratica = sp.id_sessionepratica
+            WHERE sp.fk_corso = ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, idCorso);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+
+        return 0;
+    }
+    
+    public void iscriviSessioneOnline(int idAllievo, int idSessione) throws SQLException {
+
+        String sql = """
+            INSERT INTO adesione (presenza, data_adesione, fk_allievo, fk_sessionepratica)
+            VALUES (?, CURRENT_DATE, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setBoolean(1, false);
+            ps.setInt(2, idAllievo);
+            ps.setInt(3, idSessione);
+
+            ps.executeUpdate();
+        }
     }
 }

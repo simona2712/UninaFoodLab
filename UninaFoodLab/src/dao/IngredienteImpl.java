@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import entity.Ingrediente;
 
-public class IngredienteImpl extends GenericImpl implements IngredienteDAO{
+public class IngredienteImpl extends GenericImpl<Ingrediente> implements IngredienteDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Ingrediente o) throws SQLException {
         if (!(o instanceof Ingrediente i)) return;
 
         String sql = """
@@ -54,7 +54,7 @@ public class IngredienteImpl extends GenericImpl implements IngredienteDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Ingrediente o) throws SQLException {
         if (!(o instanceof Ingrediente i)) return;
 
         String sql = """
@@ -130,6 +130,58 @@ public class IngredienteImpl extends GenericImpl implements IngredienteDAO{
                 }
             }
         }
+        return lista;
+    }
+    
+    public void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException {
+
+        String sql = """
+            INSERT INTO utilizzo (fk_ricetta, fk_ingrediente, quantita)
+            VALUES (?, ?, ?)
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, idRicetta);
+            ps.setInt(2, idIngrediente);
+            ps.setDouble(3, quantita);
+
+            ps.executeUpdate();
+        }
+    }
+    
+    public List<Ingrediente> findByRicetta(int idRicetta) throws SQLException {
+
+        List<Ingrediente> lista = new ArrayList<>();
+
+        String sql = """
+            SELECT i.*
+            FROM ingrediente i
+            JOIN utilizzo u ON i.id_ingrediente = u.fk_ingrediente
+            WHERE u.fk_ricetta = ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, idRicetta);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Ingrediente i = new Ingrediente(
+                            rs.getInt("id_ingrediente"),
+                            rs.getString("nome"),
+                            rs.getString("tipologia_conservazione"),
+                            rs.getDate("data_scadenza").toLocalDate(),
+                            rs.getDouble("calorie")
+                    );
+
+                    lista.add(i);
+                }
+            }
+        }
+
         return lista;
     }
 }

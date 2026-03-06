@@ -7,12 +7,12 @@ import entity.Notifica;
 import entity.Chef;
 import entity.Corso;
 
-public class NotificaImpl extends GenericImpl implements NotificaDAO{
+public class NotificaImpl extends GenericImpl<Notifica> implements NotificaDAO{
 	private ChefImpl chefDAO = new ChefImpl();
     private CorsoImpl corsoDAO = new CorsoImpl();
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Notifica o) throws SQLException {
         if (!(o instanceof Notifica n)) return;
 
         String sql = """
@@ -80,7 +80,7 @@ public class NotificaImpl extends GenericImpl implements NotificaDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Notifica o) throws SQLException {
         if (!(o instanceof Notifica n)) return;
 
         String sql = """

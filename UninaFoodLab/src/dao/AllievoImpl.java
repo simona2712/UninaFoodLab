@@ -6,10 +6,10 @@ import java.util.List;
 
 import entity.*;
 
-public class AllievoImpl extends GenericImpl implements AllievoDAO{
+public class AllievoImpl extends GenericImpl<Allievo> implements AllievoDAO{
 
     @Override
-    public void create(Object o) throws SQLException {
+    public void create(Allievo o) throws SQLException {
         if (!(o instanceof Allievo)) return;
         Allievo a = (Allievo) o;
 
@@ -74,7 +74,7 @@ public class AllievoImpl extends GenericImpl implements AllievoDAO{
     }
 
     @Override
-    public void update(Object o) throws SQLException {
+    public void update(Allievo o) throws SQLException {
         if (!(o instanceof Allievo)) return;
         Allievo a = (Allievo) o;
 
