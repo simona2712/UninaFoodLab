@@ -9,6 +9,8 @@ import dao.*;
 
 import entity.*;
 
+import exceptions.*;
+
 public class Controller {
 	
 	private static Controller istanziato = null;
@@ -34,31 +36,172 @@ public class Controller {
         return istanziato;
     }
     
-    public Chef loginChef(String email, String password) throws SQLException {
+    
+ // --- Login Chef ---
+    public Chef loginChef(String email, String password) 
+            throws SQLException, ValidationException, EntityNotFoundException {
 
         if (email == null || email.isBlank())
-            throw new IllegalArgumentException("Email obbligatoria");
-
+            throw new ValidationException("Email obbligatoria");
         if (password == null || password.isBlank())
-            throw new IllegalArgumentException("Password obbligatoria");
+            throw new ValidationException("Password obbligatoria");
 
         Chef chef = chefDAO.login(email, password);
 
         if (chef == null)
-            throw new IllegalArgumentException("Credenziali non valide");
+            throw new EntityNotFoundException("Credenziali non valide");
 
         return chef;
     }
     
-    public void creaCorso(Corso corso) throws SQLException {
+ // ---------------- CORSI ----------------
+    public void creaCorso(Corso corso) throws SQLException, ValidationException {
+        if (corso == null)
+            throw new ValidationException("Corso non valido");
         corsoDAO.create(corso);
     }
-    
+
+    public List<Corso> getTuttiCorsi() throws SQLException {
+        return corsoDAO.findAll();
+    }
+
     public List<Corso> filtraCorsiPerArgomento(String argomento) throws SQLException {
         return corsoDAO.findByArgomento(argomento);
     }
+
+    public List<SessioneOnline> getSessioniOnlineCorso(int idCorso) throws SQLException, EntityNotFoundException {
+        Corso c = corsoDAO.read(idCorso);
+        if (c == null)
+            throw new EntityNotFoundException("Corso non trovato");
+        return sessioneOnlineDAO.findByCorso(idCorso);
+    }
+
     
-    public void creaNotifica(Notifica n) throws SQLException {
+ // ---------------- SESSIONI ONLINE ----------------
+    public void aggiungiSessioneOnline(int id, int durata, LocalDate data, LocalTime ora, 
+                                        String link, Corso corso , int max_partecipanti)
+            throws SQLException, ValidationException {
+
+        if (data.isBefore(LocalDate.now()))
+            throw new ValidationException("La data non può essere nel passato");
+
+        if (max_partecipanti <= 0)
+            throw new ValidationException("Numero massimo partecipanti non valido");
+
+        if (link == null || link.isBlank())
+            throw new ValidationException("Link non valido");
+
+        if (corso == null)
+            throw new ValidationException("Corso non valido");
+
+        SessioneOnline sessioneOnline = new SessioneOnline(id, durata, data, ora, corso, link, max_partecipanti);
+        sessioneOnlineDAO.create(sessioneOnline);
+    }
+
+    public List<SessioneOnline> getSessioniOnlineFuture(int idCorso) throws SQLException, EntityNotFoundException {
+        Corso c = corsoDAO.read(idCorso);
+        if (c == null)
+            throw new EntityNotFoundException("Corso non trovato");
+
+        return sessioneOnlineDAO.findFutureByCorso(idCorso);
+    }
+
+    public void iscriviASessioneOnline(int idAllievo, int idSessione)
+            throws SQLException, EntityNotFoundException, DuplicateEntityException, InvalidOperationException {
+
+        Allievo a = allievoDAO.read(idAllievo);
+        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
+
+        SessioneOnline s = sessioneOnlineDAO.read(idSessione);
+        if (s == null) throw new EntityNotFoundException("Sessione non trovata");
+
+        if (s.getData().isBefore(LocalDate.now()))
+            throw new InvalidOperationException("Sessione già passata");
+
+        // Controllo duplicato
+        int count = adesioneDAO.countAdesioniByAllievoAndSessioneOnline(idAllievo, idSessione);
+        if (count > 0)
+            throw new DuplicateEntityException("Allievo già iscritto alla sessione");
+
+        adesioneDAO.iscriviSessioneOnline(idAllievo, idSessione);
+    }
+    
+    
+    
+ // ---------------- SESSIONI PRATICHE ----------------
+    public void aggiungiSessionePratica(int id, int durata, LocalDate data, LocalTime ora, 
+                                        String laboratorio, String utensili, Corso corso , int max_partecipanti)
+            throws SQLException, ValidationException {
+
+        if (laboratorio == null || laboratorio.isBlank())
+            throw new ValidationException("Laboratorio obbligatorio");
+
+        if (utensili == null || utensili.isBlank())
+            throw new ValidationException("Utensili obbligatori");
+
+        if (max_partecipanti <= 0)
+            throw new ValidationException("Numero massimo partecipanti non valido");
+
+        if (corso == null)
+            throw new ValidationException("Corso non valido");
+
+        SessionePratica sessionePratica = new SessionePratica(id, durata, data, ora, corso, max_partecipanti, utensili, laboratorio);
+        sessionePraticaDAO.create(sessionePratica);
+    }
+
+    public List<SessionePratica> getSessioniPraticheFuture(int idCorso)
+            throws SQLException, EntityNotFoundException {
+        Corso c = corsoDAO.read(idCorso);
+        if (c == null) throw new EntityNotFoundException("Corso non trovato");
+        return sessionePraticaDAO.findFutureByCorso(idCorso);
+    }
+
+    public void associaRicettaASessionePratica(int idRicetta, int idSessione)
+            throws SQLException, EntityNotFoundException, InvalidOperationException {
+
+        Ricetta r = ricettaDAO.read(idRicetta);
+        if (r == null) throw new EntityNotFoundException("Ricetta non trovata");
+
+        SessionePratica s = sessionePraticaDAO.read(idSessione);
+        if (s == null) throw new EntityNotFoundException("Sessione pratica non trovata");
+
+        if (s.getData().isBefore(LocalDate.now()))
+            throw new InvalidOperationException("Non puoi modificare sessioni passate");
+
+        ricettaDAO.associaASessionePratica(idRicetta, idSessione);
+    }
+    
+    
+    
+ // ---------------- ISCRIZIONI ----------------
+    public void iscriviAllievoACorso(int idAllievo, int idCorso)
+            throws SQLException, EntityNotFoundException, DuplicateEntityException {
+
+        Allievo a = allievoDAO.read(idAllievo);
+        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
+
+        Corso c = corsoDAO.read(idCorso);
+        if (c == null) throw new EntityNotFoundException("Corso non trovato");
+
+        int count = adesioneDAO.countAdesioniByAllievoAndCorso(idAllievo, idCorso);
+        if (count > 0)
+            throw new DuplicateEntityException("Allievo già iscritto al corso");
+
+        allievoDAO.iscriviACorso(idAllievo, idCorso);
+    }
+
+    public int numeroIscrittiCorso(int idCorso) throws SQLException, EntityNotFoundException {
+        Corso c = corsoDAO.read(idCorso);
+        if (c == null) throw new EntityNotFoundException("Corso non trovato");
+        return adesioneDAO.countAdesioniByCorso(idCorso);
+    }
+
+    
+    
+
+    // ---------------- NOTIFICHE ----------------
+    public void creaNotifica(Notifica n) throws SQLException, ValidationException {
+        if (n == null) throw new ValidationException("Notifica non valida");
         notificaDAO.create(n);
     }
 
@@ -66,183 +209,63 @@ public class Controller {
         return notificaDAO.findByChef(idChef);
     }
     
-    public void aggiungiSessioneOnline(int id, int durata, LocalDate data, LocalTime ora, 
-    		String link, Corso corso , int max_partecipanti) throws SQLException {
-    	
-    	if (data.isBefore(LocalDate.now()))
-    	    throw new IllegalArgumentException("La data non può essere nel passato");
-
-    	if (max_partecipanti <= 0)
-    	    throw new IllegalArgumentException("Numero massimo partecipanti non valido");
-
-    	if (link == null || link.isBlank())
-    	    throw new IllegalArgumentException("Link non valido");
-    	
-        if (corso == null)
-            throw new IllegalArgumentException("Corso non valido");
-
-        SessioneOnline sessioneOnline = new SessioneOnline(id, durata, data, ora, corso, link, max_partecipanti);
-        sessioneOnlineDAO.create(sessioneOnline);
-    }
     
-    public void aggiungiSessionePratica(int id, int durata, LocalDate data, LocalTime ora, 
-    		String laboratorio, String utensili, Corso corso , int max_partecipanti) throws SQLException {
-    	
-    	if (laboratorio == null || laboratorio.isBlank())
-    	    throw new IllegalArgumentException("Laboratorio obbligatorio");
-
-    	if (utensili == null || utensili.isBlank())
-    	    throw new IllegalArgumentException("Utensili obbligatori");
-
-    	if (max_partecipanti <= 0)
-    	    throw new IllegalArgumentException("Numero massimo partecipanti non valido");
-    	
-        if (corso == null)
-            throw new IllegalArgumentException("Corso non valido");
-
-        SessionePratica sessionePratica = new SessionePratica(id, durata, data, ora, corso, max_partecipanti, laboratorio, utensili);
-        sessionePraticaDAO.create(sessionePratica);
-    }
     
-    public void iscriviAllievoACorso(int idAllievo, int idCorso) throws SQLException {
-
-        Allievo a = allievoDAO.read(idAllievo);
-        Corso c = corsoDAO.read(idCorso);
-
-        if (a == null)
-            throw new IllegalArgumentException("Allievo non esistente");
-
-        if (c == null)
-            throw new IllegalArgumentException("Corso non esistente");
-
-        allievoDAO.iscriviACorso(idAllievo, idCorso);
-    }
-    
-    public void associaRicettaASessionePratica(int idRicetta, int idSessione)
-            throws SQLException {
-
-        Ricetta r = ricettaDAO.read(idRicetta);
-        SessionePratica s = sessionePraticaDAO.read(idSessione);
-
-        if (r == null)
-            throw new IllegalArgumentException("Ricetta non trovata");
-
-        if (s == null)
-            throw new IllegalArgumentException("Sessione pratica non trovata");
-
-        if (s.getData().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("Non puoi modificare sessioni passate");
-
-        ricettaDAO.associaASessionePratica(idRicetta, idSessione);
-    }
-    
+ // ---------------- ALLERGIE ----------------
     public void aggiungiAllergiaAAllievo(int idAllievo, int idAllergia)
-            throws SQLException {
+            throws SQLException, EntityNotFoundException {
 
         Allievo a = allievoDAO.read(idAllievo);
+        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
+
         Allergia all = allergiaDAO.read(idAllergia);
-
-        if (a == null)
-            throw new IllegalArgumentException("Allievo non trovato");
-
-        if (all == null)
-            throw new IllegalArgumentException("Allergia non trovata");
+        if (all == null) throw new EntityNotFoundException("Allergia non trovata");
 
         allievoDAO.aggiungiAllergia(idAllievo, idAllergia);
     }
+ 
     
-    public int numeroIscrittiCorso(int idCorso) throws SQLException {
-
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null)
-            throw new IllegalArgumentException("Corso non trovato");
-
-        return adesioneDAO.countAdesioniByCorso(idCorso);
-    }
-    
-    public List<SessionePratica> getSessioniPraticheFuture(int idCorso)
-            throws SQLException {
-
-        return sessionePraticaDAO.findFutureByCorso(idCorso);
-    }
-    
-    public List<Corso> getTuttiCorsi() throws SQLException {
-        return corsoDAO.findAll();
-    }
-    
-    public List<SessioneOnline> getSessioniOnlineCorso(int idCorso) throws SQLException {
-
-        Corso c = corsoDAO.read(idCorso);
-
-        if (c == null)
-            throw new IllegalArgumentException("Corso non trovato");
-
-        return sessioneOnlineDAO.findByCorso(idCorso);
-    }
-    
-    public void iscriviASessioneOnline(int idAllievo, int idSessione) throws SQLException {
-
-        Allievo a = allievoDAO.read(idAllievo);
-        SessioneOnline s = sessioneOnlineDAO.read(idSessione);
-
-        if (a == null)
-            throw new IllegalArgumentException("Allievo non trovato");
-
-        if (s == null)
-            throw new IllegalArgumentException("Sessione non trovata");
-
-        if (s.getData().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("Sessione già passata");
-
-        adesioneDAO.iscriviSessioneOnline(idAllievo, idSessione);
-    }
-    
-    public List<Ricetta> getRicetteSessione(int idSessione) throws SQLException {
-
+ // ---------------- RICETTE ----------------
+    public List<Ricetta> getRicetteSessione(int idSessione) throws SQLException, EntityNotFoundException {
         SessionePratica s = sessionePraticaDAO.read(idSessione);
-
-        if (s == null)
-            throw new IllegalArgumentException("Sessione non trovata");
-
+        if (s == null) throw new EntityNotFoundException("Sessione non trovata");
         return ricettaDAO.findBySessionePratica(idSessione);
     }
-    
-    
+
+    public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita)
+            throws SQLException, EntityNotFoundException, ValidationException {
+
+        if (quantita <= 0)
+            throw new ValidationException("Quantità deve essere maggiore di zero");
+
+        Ricetta r = ricettaDAO.read(idRicetta);
+        if (r == null) throw new EntityNotFoundException("Ricetta non trovata");
+
+        Ingrediente i = ingredienteDAO.read(idIngrediente);
+        if (i == null) throw new EntityNotFoundException("Ingrediente non trovato");
+
+        ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita);
+    }
+
     public boolean ricettaCompatibileConAllievo(int idRicetta, int idAllievo)
-            throws SQLException {
+            throws SQLException, EntityNotFoundException {
+
+        Ricetta r = ricettaDAO.read(idRicetta);
+        if (r == null) throw new EntityNotFoundException("Ricetta non trovata");
+
+        Allievo a = allievoDAO.read(idAllievo);
+        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
 
         List<Ingrediente> ingredienti = ingredienteDAO.findByRicetta(idRicetta);
         List<Allergia> allergie = allergiaDAO.findByAllievo(idAllievo);
 
         for (Ingrediente i : ingredienti) {
-            for (Allergia a : allergie) {
-                if (i.getNome().equalsIgnoreCase(a.getNome()))
+            for (Allergia al : allergie) {
+                if (i.getNome().equalsIgnoreCase(al.getNome()))
                     return false;
             }
         }
-
         return true;
     }
     
-    public List<SessioneOnline> getSessioniOnlineFuture(int idCorso)
-            throws SQLException {
-
-        return sessioneOnlineDAO.findFutureByCorso(idCorso);
-    }
-    
-    public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita)
-            throws SQLException {
-
-        Ricetta r = ricettaDAO.read(idRicetta);
-        Ingrediente i = ingredienteDAO.read(idIngrediente);
-
-        if (r == null)
-            throw new IllegalArgumentException("Ricetta non trovata");
-
-        if (i == null)
-            throw new IllegalArgumentException("Ingrediente non trovato");
-
-        ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita);
-    }
-
 }

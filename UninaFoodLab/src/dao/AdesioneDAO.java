@@ -10,5 +10,7 @@ public interface AdesioneDAO extends GenericDAO<Adesione>{
 	int countAdesioniBySessione(int idSessione) throws SQLException;
 	int countAdesioniByCorso(int idCorso) throws SQLException;
 	void iscriviSessioneOnline(int idAllievo, int idSessione) throws SQLException;
+	int countAdesioniByAllievoAndCorso(int idAllievo, int idCorso) throws SQLException;
+	int countAdesioniByAllievoAndSessioneOnline(int idAllievo, int idSessioneOnline) throws SQLException;
 
 }

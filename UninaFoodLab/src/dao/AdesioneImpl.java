@@ -179,4 +179,42 @@ public class AdesioneImpl extends GenericImpl<Adesione> implements AdesioneDAO{
             ps.executeUpdate();
         }
     }
+    
+
+    public int countAdesioniByAllievoAndCorso(int idAllievo, int idCorso) throws SQLException {
+        String sql = """
+            SELECT COUNT(*) FROM adesione a
+            JOIN sessionepratica sp ON a.fk_sessionepratica = sp.id_sessionepratica
+            WHERE a.fk_allievo = ? AND sp.fk_corso = ?
+        """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idAllievo);
+            ps.setInt(2, idCorso);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    
+    
+    public int countAdesioniByAllievoAndSessioneOnline(int idAllievo, int idSessioneOnline) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM adesione WHERE fk_allievo = ? AND fk_sessioneonline = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idAllievo);
+            ps.setInt(2, idSessioneOnline);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }
