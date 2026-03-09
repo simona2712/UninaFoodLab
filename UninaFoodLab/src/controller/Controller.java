@@ -268,4 +268,49 @@ public class Controller {
         return true;
     }
     
+    public void registraChef(String nome, String cognome, String telefono,
+            String email, String password,
+            String specializzazione, int anniEsperienza) throws SQLException, ValidationException {
+		
+		if (nome == null || nome.isBlank())
+		throw new ValidationException("Il nome è obbligatorio");
+		
+		if (email == null || email.isBlank())
+		throw new ValidationException("Email obbligatoria");
+		
+		if (password == null || password.length() < 4)
+		    throw new ValidationException("Password troppo corta");
+		
+		if (anniEsperienza < 0)
+		throw new ValidationException("Anni di esperienza non validi");
+		
+		if (telefono == null || telefono.isBlank())
+		    throw new ValidationException("Telefono obbligatorio");
+		
+		Chef chef = new Chef(0, nome, cognome, telefono, email, password, specializzazione, anniEsperienza);
+		
+		chefDAO.create(chef);
+	}
+    
+    
+    public void registraAllievo(String nome, String cognome, String telefono,
+            String email, String password, String livelloAbilita) throws SQLException, ValidationException {
+
+		if (nome == null || nome.isBlank()) 
+			throw new ValidationException("Il nome è obbligatorio");
+		
+		if (email == null || email.isBlank()) 
+			throw new ValidationException("L'email è obbligatoria");
+		
+		if (password == null || password.length() < 4)
+			throw new ValidationException("Password troppo corta");
+		
+		if (telefono == null || telefono.isBlank())
+		    throw new ValidationException("Telefono obbligatorio");
+		
+		Allievo allievo = new Allievo(0, nome, cognome, telefono, email, password, livelloAbilita);
+		
+		allievoDAO.create(allievo);
+	}
+    
 }

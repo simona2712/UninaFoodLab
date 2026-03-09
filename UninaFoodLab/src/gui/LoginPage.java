@@ -13,6 +13,7 @@ import java.awt.Color;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -43,9 +44,10 @@ public class LoginPage extends JFrame {
 		
 		setResizable(false);
 		setTitle("UninaFoodLab - Login");
-		setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\gigli\\Desktop\\Simona\\uni\\primo anno\\Progetto\\U_F_L_1.png"));
+		setIconImage(new ImageIcon(getClass().getResource("/img/U_F_L_1.png")).getImage());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 715, 388);
+		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(244, 233, 216));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -54,9 +56,9 @@ public class LoginPage extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setFont(new Font("Calibri", Font.PLAIN, 20));
+		lblEmail.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		lblEmail.setBackground(new Color(240, 240, 240));
-		lblEmail.setBounds(420, 80, 78, 32);
+		lblEmail.setBounds(403, 82, 78, 32);
 		contentPane.add(lblEmail);
 		
 		textField = new JTextField();
@@ -65,9 +67,9 @@ public class LoginPage extends JFrame {
 		textField.setColumns(10);
 		
 		JLabel lblPassword = new JLabel("Password");
-		lblPassword.setFont(new Font("Calibri", Font.PLAIN, 20));
+		lblPassword.setFont(new Font("SansSerif", Font.PLAIN, 18));
 		lblPassword.setBackground(UIManager.getColor("Button.background"));
-		lblPassword.setBounds(420, 137, 88, 32);
+		lblPassword.setBounds(403, 138, 88, 32);
 		contentPane.add(lblPassword);
 		
 		passwordField = new JPasswordField();
@@ -87,18 +89,41 @@ public class LoginPage extends JFrame {
         getContentPane().add(label);
         
         JButton btnAccedi = new JButton("Accedi");
-        btnAccedi.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        	}
+        btnAccedi.addActionListener(e -> {
+
+            String email = textField.getText();
+            String password = new String(passwordField.getPassword());
+
+            if(email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Inserisci email e password");
+                return;
+            }
+
+            try {
+                theController.loginChef(email, password);
+                JOptionPane.showMessageDialog(this, "Login effettuato");
+
+                // new ChefDashboard(theController);
+                dispose();
+            } catch(Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            }
         });
-        btnAccedi.setBackground(new Color(255, 255, 255));
-        btnAccedi.setFont(new Font("Calibri", Font.PLAIN, 15));
-        btnAccedi.setBounds(420, 214, 106, 32);
+        btnAccedi.setBackground(new Color(214, 168, 79));
+        btnAccedi.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        btnAccedi.setBounds(388, 214, 140, 40);
         contentPane.add(btnAccedi);
         
         JButton btnRegistrati = new JButton("Registrati");
-        btnRegistrati.setFont(new Font("Calibri", Font.PLAIN, 15));
-        btnRegistrati.setBounds(552, 214, 106, 32);
+        btnRegistrati.setBackground(new Color(214, 168, 79));
+        btnRegistrati.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		new RegistrazionePage(theController).setVisible(true);
+        	    dispose();
+        	}
+        });
+        btnRegistrati.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        btnRegistrati.setBounds(552, 214, 140, 40);
         contentPane.add(btnRegistrati);
         
         setVisible(true);
