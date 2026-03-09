@@ -12,12 +12,13 @@ public class DBConnection {
         if (connection == null || connection.isClosed()) {
             String url = "jdbc:postgresql://localhost:5432/uninafoodlab";
             String user = "postgres";
-            String password = "$Tortellino27";
+            String password = "simona";
 
             try {
                 connection = DriverManager.getConnection(url, user, password);
             } catch (SQLException e) {
                 System.err.println("Errore di connessione al database!");
+                e.printStackTrace();
                 throw e;
             }
         }

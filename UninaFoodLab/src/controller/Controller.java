@@ -75,6 +75,8 @@ public class Controller {
             throw new EntityNotFoundException("Corso non trovato");
         return sessioneOnlineDAO.findByCorso(idCorso);
     }
+    
+    
 
     
  // ---------------- SESSIONI ONLINE ----------------

@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import java.awt.Font;
+import java.awt.Image;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -58,9 +60,21 @@ public class RegistrazionePage extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		ImageIcon icon = new ImageIcon(getClass().getResource("/img/U_F_L_1.png"));
+
+        Image img = icon.getImage();
+        Image imgRidimensionata = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+
+        ImageIcon iconRidimensionata = new ImageIcon(imgRidimensionata);
+
+        JLabel label = new JLabel(iconRidimensionata);
+        label.setBounds(572, 9, 104, 92);
+
+        getContentPane().add(label);
+		
 		JLabel lblRegistrazione = new JLabel("Registrazione utente");
 		lblRegistrazione.setForeground(new Color(0, 128, 0));
-		lblRegistrazione.setFont(new Font("SansSerif", Font.BOLD, 18));
+		lblRegistrazione.setFont(new Font("SansSerif", Font.BOLD, 20));
 		lblRegistrazione.setBounds(255, 10, 207, 36);
 		contentPane.add(lblRegistrazione);
 		
@@ -123,6 +137,7 @@ public class RegistrazionePage extends JFrame {
 		contentPane.add(lblNewLabel);
 		
 		JButton btnRegistrati = new JButton("Registrati");
+		btnRegistrati.setBackground(new Color(214, 168, 79));
 		btnRegistrati.addActionListener(e -> registraUtente(rdbtnChef, rdbtnAllievo));
 		btnRegistrati.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		btnRegistrati.setBounds(521, 269, 140, 40);
@@ -200,27 +215,53 @@ public class RegistrazionePage extends JFrame {
 	    String email = textFieldEmail.getText();
 	    String password = new String(passwordField.getPassword());
 	    String telefono = textFieldNumTel.getText();
+	    
+	    if(nome.isEmpty() || cognome.isEmpty() || email.isEmpty() || password.isEmpty() || telefono.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Compila tutti i campi");
+	        return;
+	    }
 
 	    try {
 
 	        if(chef.isSelected()) {
-	            String spec = textFieldSpec.getText();
-	            int esperienza = Integer.parseInt(textFieldEsperienza.getText());
+	            String spec = textFieldSpec.getText();	    
+	            
+	            if(spec.isEmpty()) {
+	                JOptionPane.showMessageDialog(this, "Inserisci la specializzazione dello chef");
+	                return;
+	            }
+	            
+	            int esperienza = 0;
+	            try {
+	                esperienza = Integer.parseInt(textFieldEsperienza.getText().trim());
+	                if(esperienza < 0) {
+	                    JOptionPane.showMessageDialog(this, "Inserisci un numero positivo per gli anni di esperienza");
+	                    return;
+	                }  
+	            } catch(NumberFormatException ex) {
+	                JOptionPane.showMessageDialog(this, "Inserisci un numero valido per anni di esperienza");
+	                return;
+	            }
 
 	            theController.registraChef(nome, cognome, telefono, email, password, spec, esperienza);
-	            JOptionPane.showMessageDialog(this, "Chef registrato!");
+	            JOptionPane.showMessageDialog(this, "Chef registrato con successo!");
 	        }
 	        else if(allievo.isSelected()) {
 	        	String livello = (String) comboBoxLivello.getSelectedItem();
+	        	if(livello == null || livello.isEmpty()) {
+	                JOptionPane.showMessageDialog(this, "Seleziona il livello di abilità");
+	                return;
+	            }
+	        	
 	            theController.registraAllievo(nome, cognome, telefono, email, password, livello);
-	            JOptionPane.showMessageDialog(this, "Allievo registrato!");
+	            JOptionPane.showMessageDialog(this, "Allievo registrato con successo!");
 	        }
 	        else {
-	            JOptionPane.showMessageDialog(this, "Seleziona il tipo utente");
+	            JOptionPane.showMessageDialog(this, "Seleziona il tipo di utente");
 	        }
 
 	    } catch(Exception ex) {
-	        JOptionPane.showMessageDialog(this, ex.getMessage());
+	        JOptionPane.showMessageDialog(this, "Errore durante la registrazione: " + ex.getMessage());
 	    }
 	}
 }

@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
+import entity.Chef;
 
 import java.awt.Toolkit;
 import java.awt.Color;
@@ -90,23 +91,24 @@ public class LoginPage extends JFrame {
         
         JButton btnAccedi = new JButton("Accedi");
         btnAccedi.addActionListener(e -> {
+            String email = textField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
 
-            String email = textField.getText();
-            String password = new String(passwordField.getPassword());
-
-            if(email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Inserisci email e password");
+            if(email.isBlank() || password.isBlank()) {
+                JOptionPane.showMessageDialog(this, "Inserisci sia email che password!");
                 return;
             }
 
             try {
-                theController.loginChef(email, password);
+                Chef loggedChef = theController.loginChef(email, password);
+
                 JOptionPane.showMessageDialog(this, "Login effettuato");
 
-                // new ChefDashboard(theController);
+                new ChefDashboard(theController, loggedChef).setVisible(true);
                 dispose();
+
             } catch(Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage());
+                JOptionPane.showMessageDialog(this, "Errore login: " + ex.getMessage());
             }
         });
         btnAccedi.setBackground(new Color(214, 168, 79));
