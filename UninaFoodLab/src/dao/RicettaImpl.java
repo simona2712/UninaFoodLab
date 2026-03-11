@@ -248,10 +248,11 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
     public List<Ricetta> findByCorso(int idCorso) throws SQLException {
         List<Ricetta> ricette = new ArrayList<>();
         
-        String sql = "SELECT r.id, r.durata, r.descrizione, r.preparazione " +
-                     "FROM ricette r " +
-                     "JOIN corsi_ricette cr ON r.id = cr.id_ricetta " +
-                     "WHERE cr.id_corso = ?";
+        String sql = "SELECT DISTINCT r.Id_Ricetta, r.Durata, r.Descrizione, r.Preparazione " +
+                     "FROM Ricetta r " +
+                     "JOIN Svolge s ON r.Id_Ricetta = s.FK_Ricetta " +
+                     "JOIN SessionePratica sp ON s.FK_SessionePratica = sp.Id_SessionePratica " +
+                     "WHERE sp.FK_Corso = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -259,10 +260,10 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             ps.setInt(1, idCorso);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("id");
-                    int durata = rs.getInt("durata");
-                    String descrizione = rs.getString("descrizione");
-                    String preparazione = rs.getString("preparazione");
+                    int id = rs.getInt("Id_Ricetta");
+                    int durata = rs.getInt("Durata");
+                    String descrizione = rs.getString("Descrizione");
+                    String preparazione = rs.getString("Preparazione");
                     
                     Ricetta r = new Ricetta(id, durata, descrizione, preparazione);
                     ricette.add(r);

@@ -221,9 +221,9 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
         List<SessioneOnline> sessioni = new ArrayList<>();
         
         String sql = "SELECT so.id, so.durata, so.data, so.ora, so.link, so.max_partecipanti, so.id_corso " +
-                     "FROM sessioni_online so " +
-                     "JOIN corsi c ON so.id_corso = c.id " +
-                     "WHERE c.id_chef = ?";
+                     "FROM sessioneonline so " +
+                     "JOIN corso c ON so.fk_corso = c.id_corso " +
+                     "WHERE c.fk_chef = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

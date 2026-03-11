@@ -204,9 +204,9 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
         List<SessionePratica> sessioni = new ArrayList<>();
         
         String sql = "SELECT sp.id, sp.durata, sp.data, sp.ora, sp.laboratorio, sp.utensili, sp.max_partecipanti, sp.id_corso " +
-                     "FROM sessioni_pratiche sp " +
-                     "JOIN corsi c ON sp.id_corso = c.id " +
-                     "WHERE c.id_chef = ?";
+                     "FROM sessionepratica sp " +
+                     "JOIN corso c ON sp.fk_corso = c.id_corso " +
+                     "WHERE c.fk_chef = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
