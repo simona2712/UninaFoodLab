@@ -3,6 +3,7 @@ package controller;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import dao.*;
@@ -25,6 +26,8 @@ public class Controller {
     private AllergiaDAO allergiaDAO = new AllergiaImpl();
     private AdesioneDAO adesioneDAO = new AdesioneImpl();
     
+    private Chef loggedChef;
+    
     public Controller() {
 
     }
@@ -37,7 +40,7 @@ public class Controller {
     }
     
     
- // --- Login Chef ---
+    //---------------- CHEF ----------------
     public Chef loginChef(String email, String password) 
             throws SQLException, ValidationException, EntityNotFoundException {
 
@@ -50,9 +53,35 @@ public class Controller {
 
         if (chef == null)
             throw new EntityNotFoundException("Credenziali non valide");
+        
+        loggedChef = chef;
 
         return chef;
     }
+    
+    public Chef getLoggedChef() {
+        return loggedChef;
+    }
+    
+    // Restituisce sessioni online del chef
+    public List<SessioneOnline> getSessioniOnlineChef(int idChef) throws SQLException {
+        return sessioneOnlineDAO.findByChef(idChef);
+    }
+
+    // Restituisce sessioni pratiche del chef
+    public List<SessionePratica> getSessioniPraticheChef(int idChef) throws SQLException {
+        return sessionePraticaDAO.findByChef(idChef);
+    }
+
+    // Restituisce tutte le ricette dei corsi del chef
+    public List<Ricetta> getRicetteChef() throws SQLException {
+        List<Ricetta> ricette = new ArrayList<>();
+        for (Corso c : getCorsiChef()) {
+            ricette.addAll(ricettaDAO.findByCorso(c.getId()));
+        }
+        return ricette;
+    }
+
     
  // ---------------- CORSI ----------------
     public void creaCorso(Corso corso) throws SQLException, ValidationException {
@@ -74,6 +103,10 @@ public class Controller {
         if (c == null)
             throw new EntityNotFoundException("Corso non trovato");
         return sessioneOnlineDAO.findByCorso(idCorso);
+    }
+    
+    public List<Corso> getCorsiChef() throws SQLException {
+        return corsoDAO.findByChef(loggedChef);
     }
     
     

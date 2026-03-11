@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -17,22 +18,35 @@ import javax.swing.table.DefaultTableModel;
 
 import controller.Controller;
 import entity.Chef;
+import entity.Corso;
+import entity.Notifica;
+import entity.Ricetta;
+import entity.SessioneOnline;
+import entity.SessionePratica;
 
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import java.awt.event.ActionListener;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 public class ChefDashboard extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+	private JTabbedPane tabbedPane;
+	private JTable tableCorsi;
+	private JTable tableSessioni;
+	private JTable tableRicette;
+	private JTable tableNotifiche;
+	private JTextArea reportArea;
 	
 	private Controller theController;
 	private Chef loggedChef;
-
+	
 
 	/**
 	 * Create the frame.
@@ -57,176 +71,282 @@ public class ChefDashboard extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout());
 		
-		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 14));
 
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 		
-		//Gestione Corsi
+		// ==============================
+        // TAB 1 - GESTIONE CORSI
+        // ==============================
 		
-		JPanel panelCorsi = new JPanel();
-		panelCorsi.setBackground(new Color(244,233,216));
-		panelCorsi.setLayout(new BorderLayout());
+		JPanel panelCorsi = new JPanel(new BorderLayout());
+        panelCorsi.setBackground(new Color(244, 233, 216));
 
-		JLabel lblCorsi = new JLabel("Gestione Corsi");
-		lblCorsi.setForeground(new Color(0, 128, 0));
-		lblCorsi.setFont(new Font("SansSerif", Font.BOLD, 20));
-		lblCorsi.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel lblCorsi = new JLabel("Gestione Corsi");
+        lblCorsi.setForeground(new Color(0, 128, 0));
+        lblCorsi.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblCorsi.setHorizontalAlignment(SwingConstants.CENTER);
+        panelCorsi.add(lblCorsi, BorderLayout.NORTH);
 
-		panelCorsi.add(lblCorsi, BorderLayout.NORTH);
-		
-		String[] colonneCorsi = {"ID", "Titolo", "Argomento", "Durata"};
-		JTable tableCorsi = new JTable(new DefaultTableModel(colonneCorsi,0));
-		JScrollPane scrollCorsi = new JScrollPane(tableCorsi);
+        String[] colonneCorsi = {"ID", "Titolo", "Argomento", "Data Inizio"};
+        tableCorsi = new JTable(new DefaultTableModel(colonneCorsi, 0));
+        panelCorsi.add(new JScrollPane(tableCorsi), BorderLayout.CENTER);
 
-		panelCorsi.add(scrollCorsi, BorderLayout.CENTER);
-		
-		JPanel panelBottoniCorsi = new JPanel();
+        JPanel panelBottoniCorsi = new JPanel();
 
-		JButton btnAggiungiCorso = new JButton("Aggiungi Corso");
-		btnAggiungiCorso.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new AggiungiCorsoFrame(theController, loggedChef).setVisible(true);
-			}
-		});
-		JButton btnGestisciSessioni = new JButton("Gestisci Sessioni");
-		btnGestisciSessioni.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new GestioneSessioniFrame(theController).setVisible(true);
-			}
-		});
-		JButton btnFiltraArgomento = new JButton("Filtra Argomento");
+        JButton btnAggiungiCorso = new JButton("Aggiungi Corso");
+        btnAggiungiCorso.addActionListener(e -> {
+            setVisible(false);
+            new AggiungiCorsoFrame(theController, loggedChef, ChefDashboard.this).setVisible(true);
+        });
 
-		panelBottoniCorsi.add(btnAggiungiCorso);
-		panelBottoniCorsi.add(btnGestisciSessioni);
-		panelBottoniCorsi.add(btnFiltraArgomento);
+        JButton btnGestisciSessioni = new JButton("Gestisci Sessioni");
+        btnGestisciSessioni.addActionListener(e -> {
+            setVisible(false);
+            new GestioneSessioniFrame(theController).setVisible(true);
+        });
 
-		panelCorsi.add(panelBottoniCorsi, BorderLayout.SOUTH);
+        JButton btnFiltraArgomento = new JButton("Filtra Argomento");
+        btnFiltraArgomento.addActionListener(e -> {
+            String argomento = JOptionPane.showInputDialog(this, "Inserisci argomento");
+            if (argomento != null) {
+                DefaultTableModel model = (DefaultTableModel) tableCorsi.getModel();
+                model.setRowCount(0);
+                try {
+                    List<Corso> corsiFiltrati = theController.filtraCorsiPerArgomento(argomento);
+                    for (Corso co : corsiFiltrati) {
+                        model.addRow(new Object[]{co.getId(), co.getNome(), co.getArgomento(), co.getDataInizio()});
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                }
+            }
+        });
 
-		tabbedPane.addTab("Gestione Corsi", panelCorsi);
-		
-		
-		//Gestione Sessioni
-		
-		JPanel panelSessioni = new JPanel(new BorderLayout());
-		panelSessioni.setBackground(new Color(244,233,216));
+        panelBottoniCorsi.add(btnAggiungiCorso);
+        panelBottoniCorsi.add(btnGestisciSessioni);
+        panelBottoniCorsi.add(btnFiltraArgomento);
+        panelCorsi.add(panelBottoniCorsi, BorderLayout.SOUTH);
 
-		JLabel lblSessioni = new JLabel("Gestione Sessioni");
-		lblSessioni.setForeground(new Color(0, 128, 0));
-		lblSessioni.setFont(new Font("SansSerif", Font.BOLD, 20));
-		lblSessioni.setHorizontalAlignment(SwingConstants.CENTER);
-
-		panelSessioni.add(lblSessioni, BorderLayout.NORTH);
-
-		String[] colonneSessioni = {"ID","Data","Tipo","Durata"};
-		JTable tableSessioni = new JTable(new DefaultTableModel(colonneSessioni,0));
-
-		panelSessioni.add(new JScrollPane(tableSessioni), BorderLayout.CENTER);
-
-		JPanel panelBottoniSessioni = new JPanel();
-
-		JButton btnSessioneOnline = new JButton("Aggiungi Sessione Online");
-		JButton btnSessionePratica = new JButton("Aggiungi Sessione Pratica");
-		JButton btnGestisciRicette = new JButton("Gestisci Ricette");
-		btnGestisciRicette.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new GestioneRicetteFrame(theController).setVisible(true);
-			}
-		});
-
-		panelBottoniSessioni.add(btnSessioneOnline);
-		panelBottoniSessioni.add(btnSessionePratica);
-		panelBottoniSessioni.add(btnGestisciRicette);
-
-		panelSessioni.add(panelBottoniSessioni, BorderLayout.SOUTH);
-
-		tabbedPane.addTab("Sessioni", panelSessioni);
+        tabbedPane.addTab("Gestione Corsi", panelCorsi);
+        caricaCorsi();
 		
 		
+		// ==============================
+        // TAB 2 - GESTIONE SESSIONI
+        // ==============================
+        
+	    JPanel panelSessioni = new JPanel(new BorderLayout());
+	    panelSessioni.setBackground(new Color(244, 233, 216));
+	
+	     JLabel lblSessioni = new JLabel("Gestione Sessioni");
+	     lblSessioni.setForeground(new Color(0, 128, 0));
+	     lblSessioni.setFont(new Font("SansSerif", Font.BOLD, 20));
+	     lblSessioni.setHorizontalAlignment(SwingConstants.CENTER);
+	     panelSessioni.add(lblSessioni, BorderLayout.NORTH);
+	
+	     String[] colonneSessioni = {"ID", "Corso", "Tipo", "Data", "Durata"};
+	     tableSessioni = new JTable(new DefaultTableModel(colonneSessioni, 0));
+	     panelSessioni.add(new JScrollPane(tableSessioni), BorderLayout.CENTER);
+	
+	     JPanel panelBottoniSessioni = new JPanel();
+	
+	     JButton btnSessioneOnline = new JButton("Aggiungi Sessione Online");
+	     btnSessioneOnline.addActionListener(e -> new AggiungiSessioneOnlineFrame(theController).setVisible(true));
+	
+	     JButton btnSessionePratica = new JButton("Aggiungi Sessione Pratica");
+	     btnSessionePratica.addActionListener(e -> new AggiungiSessionePraticaFrame(theController).setVisible(true));
+	
+	     JButton btnGestisciRicette = new JButton("Gestisci Ricette");
+	     btnGestisciRicette.addActionListener(e -> new GestioneRicetteFrame(theController).setVisible(true));
+	
+	     panelBottoniSessioni.add(btnSessioneOnline);
+	     panelBottoniSessioni.add(btnSessionePratica);
+	     panelBottoniSessioni.add(btnGestisciRicette);
+	     panelSessioni.add(panelBottoniSessioni, BorderLayout.SOUTH);
+	
+	     tabbedPane.addTab("Sessioni", panelSessioni);
+	     
+	     caricaSessioni();
 		
-		//Gestione Ricette
+		// ==============================
+        // TAB 3 - GESTIONE RICETTE
+        // ==============================
 		
-		JPanel panelRicette = new JPanel(new BorderLayout());
-		panelRicette.setBackground(new Color(244,233,216));
+        JPanel panelRicette = new JPanel(new BorderLayout());
+        panelRicette.setBackground(new Color(244, 233, 216));
 
-		JLabel lblRicette = new JLabel("Gestione Ricette");
-		lblRicette.setForeground(new Color(0, 128, 0));
-		lblRicette.setFont(new Font("SansSerif", Font.BOLD, 20));
-		lblRicette.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel lblRicette = new JLabel("Gestione Ricette");
+        lblRicette.setForeground(new Color(0, 128, 0));
+        lblRicette.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblRicette.setHorizontalAlignment(SwingConstants.CENTER);
+        panelRicette.add(lblRicette, BorderLayout.NORTH);
 
-		panelRicette.add(lblRicette, BorderLayout.NORTH);
+        String[] colonneRicette = {"ID", "Descrizione", "Durata"};
+        tableRicette = new JTable(new DefaultTableModel(colonneRicette, 0));
+        panelRicette.add(new JScrollPane(tableRicette), BorderLayout.CENTER);
 
-		String[] colonneRicette = {"ID","Nome","Categoria"};
-		JTable tableRicette = new JTable(new DefaultTableModel(colonneRicette,0));
+        JPanel panelBottoniRicette = new JPanel();
 
-		panelRicette.add(new JScrollPane(tableRicette), BorderLayout.CENTER);
+        JButton btnAggiungiIngrediente = new JButton("Aggiungi Ingrediente");
+        btnAggiungiIngrediente.addActionListener(e -> new AggiungiIngredienteFrame(theController).setVisible(true));
 
-		JPanel panelBottoniRicette = new JPanel();
+        JButton btnAssociaSessione = new JButton("Associa a Sessione");
+        btnAssociaSessione.addActionListener(e -> new AssociaRicettaSessioneFrame(theController).setVisible(true));
 
-		JButton btnAggiungiIngrediente = new JButton("Aggiungi Ingrediente");
-		JButton btnAssociaSessione = new JButton("Associa a Sessione");
+        panelBottoniRicette.add(btnAggiungiIngrediente);
+        panelBottoniRicette.add(btnAssociaSessione);
+        panelRicette.add(panelBottoniRicette, BorderLayout.SOUTH);
 
-		panelBottoniRicette.add(btnAggiungiIngrediente);
-		panelBottoniRicette.add(btnAssociaSessione);
-
-		panelRicette.add(panelBottoniRicette, BorderLayout.SOUTH);
-
-		tabbedPane.addTab("Ricette", panelRicette);
+        tabbedPane.addTab("Ricette", panelRicette);
+        caricaRicette();
 		
-		
-		
-		//Gestione Notifiche
+		// ==============================
+        // TAB 4 - NOTIFICHE
+        // ==============================
 		
 		JPanel panelNotifiche = new JPanel(new BorderLayout());
-		panelNotifiche.setBackground(new Color(244,233,216));
+        panelNotifiche.setBackground(new Color(244, 233, 216));
 
-		JLabel lblNotifiche = new JLabel("Notifiche");
-		lblNotifiche.setForeground(new Color(0, 128, 0));
-		lblNotifiche.setFont(new Font("SansSerif", Font.BOLD, 20));
-		lblNotifiche.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel lblNotifiche = new JLabel("Notifiche");
+        lblNotifiche.setForeground(new Color(0, 128, 0));
+        lblNotifiche.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblNotifiche.setHorizontalAlignment(SwingConstants.CENTER);
+        panelNotifiche.add(lblNotifiche, BorderLayout.NORTH);
 
-		panelNotifiche.add(lblNotifiche, BorderLayout.NORTH);
+        String[] colonneNotifiche = {"ID", "Testo", "Data"};
+        tableNotifiche = new JTable(new DefaultTableModel(colonneNotifiche, 0));
+        panelNotifiche.add(new JScrollPane(tableNotifiche), BorderLayout.CENTER);
 
-		String[] colonneNotifiche = {"ID","Messaggio","Data"};
-		JTable tableNotifiche = new JTable(new DefaultTableModel(colonneNotifiche,0));
+        JPanel panelBottoniNotifiche = new JPanel();
 
-		panelNotifiche.add(new JScrollPane(tableNotifiche), BorderLayout.CENTER);
+        JButton btnNuovaNotifica = new JButton("Crea Notifica");
+        btnNuovaNotifica.addActionListener(e -> new NotificheFrame(theController).setVisible(true));
 
-		JPanel panelBottoniNotifiche = new JPanel();
+        panelBottoniNotifiche.add(btnNuovaNotifica);
+        panelNotifiche.add(panelBottoniNotifiche, BorderLayout.SOUTH);
 
-		JButton btnNuovaNotifica = new JButton("Crea Notifica");
-		btnNuovaNotifica.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				new NotificheFrame(theController).setVisible(true);
-			}
-		});
+        tabbedPane.addTab("Notifiche", panelNotifiche);
+        caricaNotifiche();
 
-		panelBottoniNotifiche.add(btnNuovaNotifica);
-
-		panelNotifiche.add(panelBottoniNotifiche, BorderLayout.SOUTH);
-
-		tabbedPane.addTab("Notifiche", panelNotifiche);
+		// ==============================
+        // TAB 5 - REPORT
+        // ==============================
 		
-		
-		//Gestione Report
-		
-		JPanel panelReport = new JPanel(new BorderLayout());
-		panelReport.setBackground(new Color(244,233,216));
+        JPanel panelReport = new JPanel(new BorderLayout());
+        panelReport.setBackground(new Color(244, 233, 216));
 
-		JLabel lblReport = new JLabel("Report Mensile");
-		lblReport.setForeground(new Color(0, 128, 0));
-		lblReport.setFont(new Font("SansSerif", Font.BOLD, 20));
-		lblReport.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel lblReport = new JLabel("Report Mensile");
+        lblReport.setForeground(new Color(0, 128, 0));
+        lblReport.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblReport.setHorizontalAlignment(SwingConstants.CENTER);
+        panelReport.add(lblReport, BorderLayout.NORTH);
 
-		panelReport.add(lblReport, BorderLayout.NORTH);
+        reportArea = new JTextArea();
+        reportArea.setEditable(false);
+        panelReport.add(new JScrollPane(reportArea), BorderLayout.CENTER);
 
-		JTextArea reportArea = new JTextArea();
-		reportArea.setEditable(false);
-
-		panelReport.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-
-		tabbedPane.addTab("Report", panelReport);
-        
+        tabbedPane.addTab("Report", panelReport);
+        //caricaReport();
         
 	}
+	
+	
+	// ------------------------------
+    // METODI DI CARICAMENTO DATI
+    // ------------------------------
+	
+	private void caricaCorsi() {
+	    try {
+	        DefaultTableModel model = (DefaultTableModel) tableCorsi.getModel();
+	        model.setRowCount(0);
+
+	        for (Corso c : theController.getCorsiChef()) {
+	            model.addRow(new Object[]{
+	                c.getId(),
+	                c.getNome(),
+	                c.getArgomento(),
+	                c.getDataInizio()
+	            });
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	
+	private void caricaSessioni() {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tableSessioni.getModel();
+            model.setRowCount(0);
+
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            for (SessioneOnline s : theController.getSessioniOnlineChef(loggedChef.getId())) {
+                model.addRow(new Object[]{
+                        s.getId(),
+                        s.getCorso().getNome(),
+                        "Online",
+                        s.getData().format(dtf),
+                        s.getDurata() + " min"
+                });
+            }
+            for (SessionePratica s : theController.getSessioniPraticheChef(loggedChef.getId())) {
+                model.addRow(new Object[]{
+                        s.getId(),
+                        s.getCorso().getNome(),
+                        "Pratica",
+                        s.getData().format(dtf),
+                        s.getDurata() + " min"
+                });
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+		
+	
+	private void caricaRicette() {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tableRicette.getModel();
+            model.setRowCount(0);
+            for (Ricetta r : theController.getRicetteChef()) {
+                model.addRow(new Object[]{
+                        r.getId(),
+                        r.getDescrizione(),
+                        r.getDurata() + " min"
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+	
+	
+	private void caricaNotifiche() {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tableNotifiche.getModel();
+            model.setRowCount(0);
+            for (Notifica n : theController.getNotificheChef(loggedChef.getId())) {
+                model.addRow(new Object[]{
+                        n.getId(),
+                        n.getTesto(),
+                        n.getDataCreazione()
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*public void caricaReport() {
+        try {
+            String report = theController.generaReport();
+            reportArea.setText(report);
+        } catch (Exception e) {
+            reportArea.setText("Errore nel caricamento report: " + e.getMessage());
+        }
+    }*/
 }

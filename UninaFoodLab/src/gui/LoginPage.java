@@ -111,13 +111,13 @@ public class LoginPage extends JFrame {
                 JOptionPane.showMessageDialog(this, "Errore login: " + ex.getMessage());
             }
         });
-        btnAccedi.setBackground(new Color(214, 168, 79));
+        btnAccedi.setBackground(new Color(253, 171, 117));
         btnAccedi.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        btnAccedi.setBounds(388, 214, 140, 40);
+        btnAccedi.setBounds(403, 214, 115, 40);
         contentPane.add(btnAccedi);
         
         JButton btnRegistrati = new JButton("Registrati");
-        btnRegistrati.setBackground(new Color(214, 168, 79));
+        btnRegistrati.setBackground(new Color(253, 171, 117));
         btnRegistrati.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		new RegistrazionePage(theController).setVisible(true);
@@ -125,7 +125,7 @@ public class LoginPage extends JFrame {
         	}
         });
         btnRegistrati.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        btnRegistrati.setBounds(552, 214, 140, 40);
+        btnRegistrati.setBounds(543, 214, 115, 40);
         contentPane.add(btnRegistrati);
         
         setVisible(true);

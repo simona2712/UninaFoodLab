@@ -124,9 +124,6 @@ public class Corso {
     
     @Override
     public String toString() {
-        return "Corso: " + nome +
-               " | Argomento: " + argomento +
-               " | Periodo: " + dataInizio + " - " + dataFine +
-               " | Chef: " + (chef != null ? chef.getFullName() : "N/D");
+        return nome;
     }
 }

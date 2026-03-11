@@ -46,14 +46,16 @@ public class AggiungiCorsoFrame extends JFrame {
 	private JTextField textFieldNome;
 	private Chef loggedChef;
 	
+	private ChefDashboard dashboard;
 	
 	/**
 	 * Create the frame.
 	 */
-	public AggiungiCorsoFrame(Controller c, Chef chefLoggato) {
+	public AggiungiCorsoFrame(Controller c, Chef chefLoggato, ChefDashboard dash) {
 		
 		theController = c;
 		this.loggedChef = chefLoggato;
+		this.dashboard= dash;
 		
 		setResizable(false);
 		setTitle("Aggiungi Corso");
@@ -131,9 +133,9 @@ public class AggiungiCorsoFrame extends JFrame {
 		
 		JButton btnNewButton = new JButton("Crea Corso");
 		btnNewButton.addActionListener(e -> salvaCorso());
-		btnNewButton.setBackground(new Color(214, 168, 79));
-		btnNewButton.setFont(new Font("SansSerif", Font.BOLD, 14));
-		btnNewButton.setBounds(255, 267, 111, 37);
+		btnNewButton.setBackground(new Color(253, 171, 117));
+		btnNewButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		btnNewButton.setBounds(255, 267, 128, 37);
 		contentPane.add(btnNewButton);
 		
 		 ImageIcon icon = new ImageIcon(getClass().getResource("/img/U_F_L_1.png"));
@@ -147,6 +149,14 @@ public class AggiungiCorsoFrame extends JFrame {
 	     label.setBounds(513, 74, 166, 143);
 
 	     getContentPane().add(label);
+	     
+	     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+	     addWindowListener(new java.awt.event.WindowAdapter() {
+	         public void windowClosing(java.awt.event.WindowEvent e) {
+	             dashboard.setVisible(true);
+	         }
+	     });
 		       
         
 	}
@@ -211,6 +221,7 @@ public class AggiungiCorsoFrame extends JFrame {
 	        theController.creaCorso(corso);
 
 	        JOptionPane.showMessageDialog(this, "Corso creato con successo!");
+	        dashboard.setVisible(true);
 	        dispose();
 
 	    } catch (SQLException ex) {

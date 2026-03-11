@@ -1,8 +1,12 @@
 package dao;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import database.DBConnection;
 import entity.*;
 
 
@@ -211,5 +215,37 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
         }
 
         return lista;
+    }
+    
+    public List<SessioneOnline> findByChef(int idChef) throws SQLException {
+        List<SessioneOnline> sessioni = new ArrayList<>();
+        
+        String sql = "SELECT so.id, so.durata, so.data, so.ora, so.link, so.max_partecipanti, so.id_corso " +
+                     "FROM sessioni_online so " +
+                     "JOIN corsi c ON so.id_corso = c.id " +
+                     "WHERE c.id_chef = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, idChef);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    int durata = rs.getInt("durata");
+                    LocalDate data = rs.getDate("data").toLocalDate();
+                    LocalTime ora = rs.getTime("ora").toLocalTime();
+                    String link = rs.getString("link");
+                    int max = rs.getInt("max_partecipanti");
+                    
+                    int idCorso = rs.getInt("id_corso");
+                    Corso corso = new CorsoImpl().read(idCorso);
+                    
+                    SessioneOnline s = new SessioneOnline(id, durata, data, ora, corso, link, max);
+                    sessioni.add(s);
+                }
+            }
+        }
+        return sessioni;
     }
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import database.DBConnection;
 import entity.Ricetta;
 
 public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
@@ -241,5 +242,33 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
 
             ps.executeUpdate();
         }
+    }
+    
+
+    public List<Ricetta> findByCorso(int idCorso) throws SQLException {
+        List<Ricetta> ricette = new ArrayList<>();
+        
+        String sql = "SELECT r.id, r.durata, r.descrizione, r.preparazione " +
+                     "FROM ricette r " +
+                     "JOIN corsi_ricette cr ON r.id = cr.id_ricetta " +
+                     "WHERE cr.id_corso = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, idCorso);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    int durata = rs.getInt("durata");
+                    String descrizione = rs.getString("descrizione");
+                    String preparazione = rs.getString("preparazione");
+                    
+                    Ricetta r = new Ricetta(id, durata, descrizione, preparazione);
+                    ricette.add(r);
+                }
+            }
+        }
+        return ricette;
     }
 }

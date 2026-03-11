@@ -137,7 +137,7 @@ public class RegistrazionePage extends JFrame {
 		contentPane.add(lblNewLabel);
 		
 		JButton btnRegistrati = new JButton("Registrati");
-		btnRegistrati.setBackground(new Color(214, 168, 79));
+		btnRegistrati.setBackground(new Color(253, 171, 117));
 		btnRegistrati.addActionListener(e -> registraUtente(rdbtnChef, rdbtnAllievo));
 		btnRegistrati.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		btnRegistrati.setBounds(521, 269, 140, 40);
@@ -248,6 +248,7 @@ public class RegistrazionePage extends JFrame {
 	        }
 	        else if(allievo.isSelected()) {
 	        	String livello = (String) comboBoxLivello.getSelectedItem();
+	        	//livello = livello.toLowerCase();
 	        	if(livello == null || livello.isEmpty()) {
 	                JOptionPane.showMessageDialog(this, "Seleziona il livello di abilità");
 	                return;

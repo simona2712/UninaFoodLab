@@ -125,7 +125,7 @@ public class CorsoImpl extends GenericImpl<Corso> implements CorsoDAO{
     
     public List<Corso> findByArgomento(String argomento) throws SQLException {
         List<Corso> lista = new ArrayList<>();
-        String sql = "SELECT * FROM corso WHERE argomento ILIKE ? ORDER BY titolo ASC";
+        String sql = "SELECT * FROM corso WHERE argomento ILIKE ? ORDER BY nome ASC";
 
         Connection conn = getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -185,6 +185,38 @@ public class CorsoImpl extends GenericImpl<Corso> implements CorsoDAO{
                 }
             }
         }
+        return lista;
+    }
+    
+    public List<Corso> findByChef(Chef chef) throws SQLException {
+
+        List<Corso> lista = new ArrayList<>();
+
+        String sql = "SELECT * FROM corso WHERE fk_chef = ? ORDER BY data_inizio";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ps.setInt(1, chef.getId());
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Corso c = new Corso(
+                            rs.getInt("id_corso"),
+                            rs.getString("nome"),
+                            rs.getString("argomento"),
+                            rs.getDate("data_inizio").toLocalDate(),
+                            rs.getDate("data_fine").toLocalDate(),
+                            rs.getString("frequenza"),
+                            chef
+                    );
+
+                    lista.add(c);
+                }
+            }
+        }
+
         return lista;
     }
     

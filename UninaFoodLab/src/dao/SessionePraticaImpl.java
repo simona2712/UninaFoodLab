@@ -1,8 +1,12 @@
 package dao;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import database.DBConnection;
 import entity.*;
 
 
@@ -194,5 +198,38 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
         }
 
         return lista;
+    }
+    
+    public List<SessionePratica> findByChef(int idChef) throws SQLException {
+        List<SessionePratica> sessioni = new ArrayList<>();
+        
+        String sql = "SELECT sp.id, sp.durata, sp.data, sp.ora, sp.laboratorio, sp.utensili, sp.max_partecipanti, sp.id_corso " +
+                     "FROM sessioni_pratiche sp " +
+                     "JOIN corsi c ON sp.id_corso = c.id " +
+                     "WHERE c.id_chef = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, idChef);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    int durata = rs.getInt("durata");
+                    LocalDate data = rs.getDate("data").toLocalDate();
+                    LocalTime ora = rs.getTime("ora").toLocalTime();
+                    String laboratorio = rs.getString("laboratorio");
+                    String utensili = rs.getString("utensili");
+                    int max = rs.getInt("max_partecipanti");
+                    
+                    int idCorso = rs.getInt("id_corso");
+                    Corso corso = new CorsoImpl().read(idCorso);
+                    
+                    SessionePratica s = new SessionePratica(id, durata, data, ora, corso, max, utensili, laboratorio);
+                    sessioni.add(s);
+                }
+            }
+        }
+        return sessioni;
     }
 }

@@ -16,7 +16,7 @@ public class AllievoImpl extends GenericImpl<Allievo> implements AllievoDAO{
         String sql = """
             INSERT INTO allievo
             (nome, cognome, numero_telefono, email, livello_abilita, password)
-            VALUES (?,?,?,?,?,?)
+            VALUES (?,?,?,?,?::abilita,?)
         """;
 
         try (PreparedStatement ps = getConnection()
@@ -81,7 +81,7 @@ public class AllievoImpl extends GenericImpl<Allievo> implements AllievoDAO{
         String sql = """
             UPDATE allievo
             SET nome=?, cognome=?, numero_telefono=?, email=?,
-                livello_abilita=?, password=?
+                livello_abilita=?::abilita, password=?
             WHERE id_allievo=?
         """;
 
