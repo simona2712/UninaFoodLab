@@ -63,7 +63,36 @@ public class Controller {
         return loggedChef;
     }
     
-    // Restituisce sessioni online del chef
+ // Restituisce tutte le sessioni del chef (sia online che pratiche)
+    public List<Object[]> getSessioniChef() throws SQLException {
+        List<Object[]> listaSessioni = new ArrayList<>();
+
+        // Sessioni online
+        for (SessioneOnline s : sessioneOnlineDAO.findByChef(loggedChef.getId())) {
+            listaSessioni.add(new Object[]{
+                s.getId(),
+                s.getCorso().getNome(),
+                "Online",
+                s.getData(),
+                s.getDurata()
+            });
+        }
+
+        // Sessioni pratiche
+        for (SessionePratica s : sessionePraticaDAO.findByChef(loggedChef.getId())) {
+            listaSessioni.add(new Object[]{
+                s.getId(),
+                s.getCorso().getNome(),
+                "Pratica",
+                s.getData(),
+                s.getDurata()
+            });
+        }
+
+        return listaSessioni;
+    }
+    
+ // Restituisce sessioni online del chef
     public List<SessioneOnline> getSessioniOnlineChef(int idChef) throws SQLException {
         return sessioneOnlineDAO.findByChef(idChef);
     }
@@ -81,7 +110,30 @@ public class Controller {
         }
         return ricette;
     }
-
+    
+    public void registraChef(String nome, String cognome, String telefono,
+            String email, String password,
+            String specializzazione, int anniEsperienza) throws SQLException, ValidationException {
+		
+		if (nome == null || nome.isBlank())
+		throw new ValidationException("Il nome è obbligatorio");
+		
+		if (email == null || email.isBlank())
+		throw new ValidationException("Email obbligatoria");
+		
+		if (password == null || password.length() < 4)
+		    throw new ValidationException("Password troppo corta");
+		
+		if (anniEsperienza < 0)
+		throw new ValidationException("Anni di esperienza non validi");
+		
+		if (telefono == null || telefono.isBlank())
+		    throw new ValidationException("Telefono obbligatorio");
+		
+		Chef chef = new Chef(0, nome, cognome, telefono, email, password, specializzazione, anniEsperienza);
+		
+		chefDAO.create(chef);
+	}
     
  // ---------------- CORSI ----------------
     public void creaCorso(Corso corso) throws SQLException, ValidationException {
@@ -184,11 +236,10 @@ public class Controller {
         sessionePraticaDAO.create(sessionePratica);
     }
 
-    public List<SessionePratica> getSessioniPraticheFuture(int idCorso)
-            throws SQLException, EntityNotFoundException {
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null) throw new EntityNotFoundException("Corso non trovato");
-        return sessionePraticaDAO.findFutureByCorso(idCorso);
+    public List<SessionePratica> getSessioniPraticheFuture() throws SQLException {
+        return sessionePraticaDAO.findAll().stream()
+                .filter(s -> s.getData().isAfter(LocalDate.now()))
+                .toList();
     }
 
     public void associaRicettaASessionePratica(int idRicetta, int idSessione)
@@ -205,6 +256,7 @@ public class Controller {
 
         ricettaDAO.associaASessionePratica(idRicetta, idSessione);
     }
+    
     
     
     
@@ -232,7 +284,6 @@ public class Controller {
     }
 
     
-    
 
     // ---------------- NOTIFICHE ----------------
     public void creaNotifica(Notifica n) throws SQLException, ValidationException {
@@ -242,6 +293,23 @@ public class Controller {
 
     public List<Notifica> getNotificheChef(int idChef) throws SQLException {
         return notificaDAO.findByChef(idChef);
+    }
+    
+    public void inviaNotificaCorso(Corso corso, String testo) throws SQLException, ValidationException {
+        if (corso == null) throw new ValidationException("Seleziona un corso");
+        if (testo == null || testo.isBlank()) throw new ValidationException("Testo non valido");
+
+        // crea la notifica associata a quel corso
+        Notifica n = new Notifica(0, testo, getLoggedChef(), corso);
+        creaNotifica(n);
+    }
+
+    public void inviaNotificaATutti(String testo) throws SQLException, ValidationException {
+        if (testo == null || testo.isBlank()) throw new ValidationException("Testo non valido");
+
+        // notifica generale, corso = null
+        Notifica n = new Notifica(0, testo, getLoggedChef(), null);
+        creaNotifica(n);
     }
     
     
@@ -303,31 +371,9 @@ public class Controller {
         return true;
     }
     
-    public void registraChef(String nome, String cognome, String telefono,
-            String email, String password,
-            String specializzazione, int anniEsperienza) throws SQLException, ValidationException {
-		
-		if (nome == null || nome.isBlank())
-		throw new ValidationException("Il nome è obbligatorio");
-		
-		if (email == null || email.isBlank())
-		throw new ValidationException("Email obbligatoria");
-		
-		if (password == null || password.length() < 4)
-		    throw new ValidationException("Password troppo corta");
-		
-		if (anniEsperienza < 0)
-		throw new ValidationException("Anni di esperienza non validi");
-		
-		if (telefono == null || telefono.isBlank())
-		    throw new ValidationException("Telefono obbligatorio");
-		
-		Chef chef = new Chef(0, nome, cognome, telefono, email, password, specializzazione, anniEsperienza);
-		
-		chefDAO.create(chef);
-	}
     
     
+ // ---------------- ALLIEVO ---------------- 
     public void registraAllievo(String nome, String cognome, String telefono,
             String email, String password, String livelloAbilita) throws SQLException, ValidationException {
 
@@ -347,5 +393,36 @@ public class Controller {
 		
 		allievoDAO.create(allievo);
 	}
+    
+    // ---------------- INGREDIENTE ----------------
+    public int getIngredienteByName(String nome) throws SQLException, EntityNotFoundException {
+        List<Ingrediente> lista = ingredienteDAO.findByNome(nome);
+
+        if (lista.isEmpty()) {
+            throw new EntityNotFoundException("Ingrediente non trovato: " + nome);
+        }
+
+        return lista.get(0).getId();
+    }
+    
+    public int creaIngrediente(String nome, String tipologia, java.time.LocalDate scadenza, double calorie) 
+            throws SQLException, ValidationException {
+
+        if (nome == null || nome.isBlank()) 
+            throw new ValidationException("Nome ingrediente non valido");
+        if (calorie < 0) 
+            throw new ValidationException("Calorie non valide");
+
+        Ingrediente i = new Ingrediente(0, nome, tipologia, scadenza, calorie);
+        i.setNome(nome);
+        i.setTipologiaConservazione(tipologia);
+        i.setDataScadenza(scadenza);
+        i.setCalorie(calorie);
+
+        ingredienteDAO.create(i);
+        return i.getId();
+    }
+    
+    
     
 }

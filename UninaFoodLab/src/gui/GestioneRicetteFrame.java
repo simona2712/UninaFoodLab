@@ -3,6 +3,7 @@ package gui;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import controller.Controller;
+import entity.Ricetta;
 
 public class GestioneRicetteFrame extends JFrame {
 
@@ -56,9 +58,9 @@ public class GestioneRicetteFrame extends JFrame {
 				new Object[][] {},
 				new String[] {
 						"ID",
-						"Nome",
-						"Difficoltà",
-						"Tempo preparazione"
+						"Descrizione",
+						"Durata",
+						"Calorie"
 				}
 		);
 
@@ -69,6 +71,7 @@ public class GestioneRicetteFrame extends JFrame {
 		contentPane.add(scroll);
 
 		JButton btnIngrediente = new JButton("Aggiungi Ingrediente");
+		btnIngrediente.setBackground(new Color(253, 171, 117));
 		btnIngrediente.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		btnIngrediente.setBounds(150,300,200,35);
 		contentPane.add(btnIngrediente);
@@ -89,26 +92,40 @@ public class GestioneRicetteFrame extends JFrame {
 		});
 
 		JButton btnAssocia = new JButton("Associa a Sessione");
+		btnAssocia.setBackground(new Color(253, 171, 117));
 		btnAssocia.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		btnAssocia.setBounds(400,300,200,35);
 		contentPane.add(btnAssocia);
 
 		btnAssocia.addActionListener(e -> {
-
 			int row = tableRicette.getSelectedRow();
-
 			if(row == -1) {
 				JOptionPane.showMessageDialog(this,"Seleziona una ricetta");
 				return;
 			}
-
 			int idRicetta = (int) tableModel.getValueAt(row,0);
-
 			new AssociaRicettaSessioneFrame(theController,idRicetta).setVisible(true);
-
 		});
 
 		setVisible(true);
+		caricaRicette();
 	}
+	
+	private void caricaRicette() {
+        try {
+            tableModel.setRowCount(0);
+            List<Ricetta> ricette = theController.getRicetteChef();
+            for(Ricetta r : ricette) {
+                tableModel.addRow(new Object[]{
+                    r.getId(),
+                    r.getDescrizione(),
+                    r.getDurata(),
+                    r.calcolaCalorieTotali()
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errore caricamento ricette: " + e.getMessage());
+        }
+    }
 
 }

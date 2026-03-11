@@ -190,10 +190,26 @@ public class ChefDashboard extends JFrame {
         JPanel panelBottoniRicette = new JPanel();
 
         JButton btnAggiungiIngrediente = new JButton("Aggiungi Ingrediente");
-        btnAggiungiIngrediente.addActionListener(e -> new AggiungiIngredienteFrame(theController).setVisible(true));
+        btnAggiungiIngrediente.addActionListener(e -> {
+            int row = tableRicette.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(this, "Seleziona una ricetta");
+                return;
+            }
+            int idRicetta = (int) tableRicette.getValueAt(row, 0);
+            new AggiungiIngredienteFrame(theController, idRicetta).setVisible(true);
+        });
 
         JButton btnAssociaSessione = new JButton("Associa a Sessione");
-        btnAssociaSessione.addActionListener(e -> new AssociaRicettaSessioneFrame(theController).setVisible(true));
+        btnAssociaSessione.addActionListener(e -> {
+            int row = tableRicette.getSelectedRow();
+            if(row == -1) {
+                JOptionPane.showMessageDialog(this, "Seleziona una ricetta");
+                return;
+            }
+            int idRicetta = (int) tableRicette.getValueAt(row, 0);
+            new AssociaRicettaSessioneFrame(theController, idRicetta).setVisible(true);
+        });
 
         panelBottoniRicette.add(btnAggiungiIngrediente);
         panelBottoniRicette.add(btnAssociaSessione);

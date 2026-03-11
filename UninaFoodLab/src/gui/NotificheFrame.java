@@ -89,6 +89,12 @@ public class NotificheFrame extends JFrame {
 		comboCorsi = new JComboBox<>();
 		comboCorsi.setBounds(140,260,200,25);
 		contentPane.add(comboCorsi);
+		
+		radioSingolo.setSelected(true);
+        comboCorsi.setEnabled(true);
+
+        radioSingolo.addActionListener(e -> comboCorsi.setEnabled(true));
+        radioTutti.addActionListener(e -> comboCorsi.setEnabled(false));
 
 		JButton btnInvia = new JButton("Invia notifica");
 		btnInvia.setFont(new Font("SansSerif", Font.PLAIN, 14));
@@ -113,38 +119,35 @@ public class NotificheFrame extends JFrame {
 	}
 	
 	private void inviaNotifica() {
+        String testo = textMessaggio.getText().trim();
+        if (testo.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Inserisci un messaggio");
+            return;
+        }
 
-		String messaggio = textMessaggio.getText();
+        try {
+            if (radioTutti.isSelected()) {
+                theController.inviaNotificaATutti(testo);
+            } else {
+                Corso corso = (Corso) comboCorsi.getSelectedItem();
+                theController.inviaNotificaCorso(corso, testo);
+            }
+            JOptionPane.showMessageDialog(this, "Notifica inviata");
+            dispose();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
+        }
+    }
 
-		if(messaggio.isEmpty()) {
-			JOptionPane.showMessageDialog(this,"Inserisci un messaggio");
-			return;
-		} 
-		try {
-			if(radioTutti.isSelected()) {
-				theController.inviaNotificaATutti(messaggio);
-			} else {
-				Corso corso = (Corso) comboCorsi.getSelectedItem();
-				theController.inviaNotificaCorso(corso, messaggio);
-			}
-			JOptionPane.showMessageDialog(this,"Notifica inviata");
-		} catch(Exception ex) {
-			JOptionPane.showMessageDialog(this,ex.getMessage());
-		}
-	}
-	
-	private void caricaCorsi() {
-
-	    try {
-	        List<Corso> corsi = theController.getCorsiChef();
-
-	        for(Corso c : corsi) {
-	        	comboCorsi.addItem(c);
-	        }
-
-	    } catch(Exception e) {
-	        JOptionPane.showMessageDialog(this, e.getMessage());
-	    }
- }
+    private void caricaCorsi() {
+        try {
+            List<Corso> corsi = theController.getCorsiChef();
+            for (Corso c : corsi) {
+                comboCorsi.addItem(c);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Errore caricamento corsi: " + e.getMessage());
+        }
+    }
 
 }

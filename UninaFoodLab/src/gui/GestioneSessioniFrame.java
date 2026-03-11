@@ -90,7 +90,19 @@ public class GestioneSessioniFrame extends JFrame {
 			new AggiungiSessionePraticaFrame(theController).setVisible(true);
 		});
 		
+		caricaSessioni();
 		
 	}
+	
+	public void caricaSessioni() {
+        try {
+            tableModel.setRowCount(0);
+            for (Object[] s : theController.getSessioniChef()) {
+                tableModel.addRow(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
