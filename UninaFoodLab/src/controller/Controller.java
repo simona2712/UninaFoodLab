@@ -106,11 +106,7 @@ public class Controller {
 
     // Restituisce tutte le ricette dei corsi del chef
     public List<Ricetta> getRicetteChef() throws SQLException {
-        List<Ricetta> ricette = new ArrayList<>();
-        for (Corso c : getCorsiChef()) {
-            ricette.addAll(ricettaDAO.findByCorso(c.getId()));
-        }
-        return ricette;
+        return ricettaDAO.findAll();
     }
     
     public void registraChef(String nome, String cognome, String telefono,
@@ -448,6 +444,11 @@ public class Controller {
 
         return result;
     }
+    
+    public void aggiungiRicetta(Ricetta r) throws Exception {
+        ricettaDAO.create(r);
+    }
+    
     
  // ---------------- ALLIEVO ---------------- 
     public void registraAllievo(String nome, String cognome, String telefono,

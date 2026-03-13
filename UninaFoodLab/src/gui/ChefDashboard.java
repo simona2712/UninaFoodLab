@@ -103,7 +103,6 @@ public class ChefDashboard extends JFrame {
 
         JButton btnGestisciSessioni = new JButton("Gestisci Sessioni");
         btnGestisciSessioni.addActionListener(e -> {
-            setVisible(false);
             new GestioneSessioniFrame(theController).setVisible(true);
         });
 
@@ -123,6 +122,8 @@ public class ChefDashboard extends JFrame {
                 }
             }
         });
+        
+        
 
         panelBottoniCorsi.add(btnAggiungiCorso);
         panelBottoniCorsi.add(btnGestisciSessioni);
@@ -153,13 +154,13 @@ public class ChefDashboard extends JFrame {
 	     JPanel panelBottoniSessioni = new JPanel();
 	
 	     JButton btnSessioneOnline = new JButton("Aggiungi Sessione Online");
-	     btnSessioneOnline.addActionListener(e -> new AggiungiSessioneOnlineFrame(theController).setVisible(true));
+	     btnSessioneOnline.addActionListener(e -> new AggiungiSessioneOnlineFrame(theController, null, ChefDashboard.this).setVisible(true));
 	
 	     JButton btnSessionePratica = new JButton("Aggiungi Sessione Pratica");
-	     btnSessionePratica.addActionListener(e -> new AggiungiSessionePraticaFrame(theController).setVisible(true));
+	     btnSessionePratica.addActionListener(e -> new AggiungiSessionePraticaFrame(theController, null, ChefDashboard.this).setVisible(true));
 	
 	     JButton btnGestisciRicette = new JButton("Gestisci Ricette");
-	     btnGestisciRicette.addActionListener(e -> new GestioneRicetteFrame(theController).setVisible(true));
+	     btnGestisciRicette.addActionListener(e -> new GestioneRicetteFrame(theController, ChefDashboard.this).setVisible(true));
 	
 	     panelBottoniSessioni.add(btnSessioneOnline);
 	     panelBottoniSessioni.add(btnSessionePratica);
@@ -169,6 +170,11 @@ public class ChefDashboard extends JFrame {
 	     tabbedPane.addTab("Sessioni", panelSessioni);
 	     
 	     caricaSessioni();
+	     
+	     JButton btnApriReport = new JButton("Apri Report Grafici");
+	     btnApriReport.addActionListener(e -> new ReportFrame(theController));
+	     panelBottoniCorsi.add(btnApriReport);
+	    
 		
 		// ==============================
         // TAB 3 - GESTIONE RICETTE
@@ -183,11 +189,16 @@ public class ChefDashboard extends JFrame {
         lblRicette.setHorizontalAlignment(SwingConstants.CENTER);
         panelRicette.add(lblRicette, BorderLayout.NORTH);
 
-        String[] colonneRicette = {"ID", "Descrizione", "Durata"};
+        String[] colonneRicette = {"ID", "Descrizione", "Durata", "Preparazione", "Allergeni"};
         tableRicette = new JTable(new DefaultTableModel(colonneRicette, 0));
         panelRicette.add(new JScrollPane(tableRicette), BorderLayout.CENTER);
 
         JPanel panelBottoniRicette = new JPanel();
+        
+        JButton btnAggiungiRicetta = new JButton("Aggiungi Ricetta");
+        btnAggiungiRicetta.addActionListener(e -> 
+            new AggiungiRicettaFrame(theController, loggedChef, ChefDashboard.this).setVisible(true)
+        );
 
         JButton btnAggiungiIngrediente = new JButton("Aggiungi Ingrediente");
         btnAggiungiIngrediente.addActionListener(e -> {
@@ -211,6 +222,7 @@ public class ChefDashboard extends JFrame {
             new AssociaRicettaSessioneFrame(theController, idRicetta).setVisible(true);
         });
 
+        panelBottoniRicette.add(btnAggiungiRicetta);
         panelBottoniRicette.add(btnAggiungiIngrediente);
         panelBottoniRicette.add(btnAssociaSessione);
         panelRicette.add(panelBottoniRicette, BorderLayout.SOUTH);
@@ -245,26 +257,6 @@ public class ChefDashboard extends JFrame {
 
         tabbedPane.addTab("Notifiche", panelNotifiche);
         caricaNotifiche();
-
-		// ==============================
-        // TAB 5 - REPORT
-        // ==============================
-		
-        JPanel panelReport = new JPanel(new BorderLayout());
-        panelReport.setBackground(new Color(244, 233, 216));
-
-        JLabel lblReport = new JLabel("Report Mensile");
-        lblReport.setForeground(new Color(0, 128, 0));
-        lblReport.setFont(new Font("SansSerif", Font.BOLD, 20));
-        lblReport.setHorizontalAlignment(SwingConstants.CENTER);
-        panelReport.add(lblReport, BorderLayout.NORTH);
-
-        reportArea = new JTextArea();
-        reportArea.setEditable(false);
-        panelReport.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-
-        tabbedPane.addTab("Report", panelReport);
-        //caricaReport();
         
 	}
 	
@@ -332,7 +324,9 @@ public class ChefDashboard extends JFrame {
                 model.addRow(new Object[]{
                         r.getId(),
                         r.getDescrizione(),
-                        r.getDurata() + " min"
+                        r.getDurata() + " min",
+                        r.getPreparazione(),
+                        String.join(", ", r.getAllergeni())
                 });
             }
         } catch (Exception e) {
@@ -356,13 +350,16 @@ public class ChefDashboard extends JFrame {
             e.printStackTrace();
         }
     }
-
-    /*public void caricaReport() {
-        try {
-            String report = theController.generaReport();
-            reportArea.setText(report);
-        } catch (Exception e) {
-            reportArea.setText("Errore nel caricamento report: " + e.getMessage());
-        }
-    }*/
+	
+	public void aggiornaTabellaCorsi() {
+	    caricaCorsi();
+	}
+	
+	public void aggiornaTabellaSessioni() {
+	    caricaSessioni();
+	}
+	
+	public void aggiornaTabellaRicette() {
+	    caricaRicette();
+	}
 }

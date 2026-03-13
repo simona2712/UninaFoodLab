@@ -77,7 +77,7 @@ public class GestioneSessioniFrame extends JFrame {
 		contentPane.add(btnSessioneOnline);
 
 		btnSessioneOnline.addActionListener(e -> {
-			new AggiungiSessioneOnlineFrame(theController).setVisible(true);
+			new AggiungiSessioneOnlineFrame(theController, GestioneSessioniFrame.this, null).setVisible(true);
 		});
 
 		JButton btnSessionePratica = new JButton("Aggiungi sessione pratica");
@@ -87,7 +87,7 @@ public class GestioneSessioniFrame extends JFrame {
 		contentPane.add(btnSessionePratica);
 
 		btnSessionePratica.addActionListener(e -> {
-			new AggiungiSessionePraticaFrame(theController).setVisible(true);
+			new AggiungiSessionePraticaFrame(theController, GestioneSessioniFrame.this, null).setVisible(true);
 		});
 		
 		caricaSessioni();
@@ -104,5 +104,9 @@ public class GestioneSessioniFrame extends JFrame {
             e.printStackTrace();
         }
     }
+	
+	public void aggiornaTabellaSessioni() {
+	    caricaSessioni();
+	}
 
 }

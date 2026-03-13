@@ -16,7 +16,7 @@ public class CorsoImpl extends GenericImpl<Corso> implements CorsoDAO{
 
         String sql = """
                 INSERT INTO corso (nome, argomento, data_inizio, data_fine, frequenza, fk_chef) 
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?::frequenza, ?)
             """;
         
         try (PreparedStatement ps = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

@@ -19,7 +19,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
 
         String sql = """
             INSERT INTO ricetta (durata, descrizione, preparazione, allergeni)
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?::tipo_prep, ?::tipo_allergeni[])
         """;
         
 
@@ -27,7 +27,13 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             ps.setInt(1, r.getDurata());
             ps.setString(2, r.getDescrizione());
             ps.setString(3, r.getPreparazione());
-            ps.setString(4, String.join(", ", r.getAllergeni()));
+            if (r.getAllergeni() != null && !r.getAllergeni().isEmpty()) {
+                Object[] allergeniArray = r.getAllergeni().toArray();
+                Array sqlArray = getConnection().createArrayOf("tipo_allergeni", allergeniArray);
+                ps.setArray(4, sqlArray);
+            } else {
+                ps.setNull(4, Types.ARRAY);
+            }
 
             ps.executeUpdate();
 
@@ -57,14 +63,14 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
                         rs.getString("descrizione"),
                         rs.getString("preparazione")
                     );
-                    
 
                     String allergeniStr = rs.getString("allergeni");
-                    if (allergeniStr != null && !allergeniStr.isEmpty()) {
-                        List<String> listaAllergeni = Arrays.stream(allergeniStr.split(","))
-                                                            .map(String::trim)
-                                                            .collect(Collectors.toList());
+                    if (allergeniStr != null && !allergeniStr.equals("{}")) {
+                        String pulita = allergeniStr.replace("{", "").replace("}", "");
+                        List<String> listaAllergeni = Arrays.asList(pulita.split(","));
                         r.setAllergeni(listaAllergeni);
+                    } else {
+                        r.setAllergeni(new ArrayList<>());
                     }
 
                     UtilizzoImpl uDAO = new UtilizzoImpl();
@@ -124,6 +130,16 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
                     rs.getString("descrizione"),
                     rs.getString("preparazione")
                 );
+
+                String allergeniStr = rs.getString("allergeni");
+                if (allergeniStr != null && !allergeniStr.equals("{}")) {
+                    String pulita = allergeniStr.replace("{", "").replace("}", "");
+                    List<String> listaAllergeni = Arrays.asList(pulita.split(","));
+                    r.setAllergeni(listaAllergeni);
+                } else {
+                    r.setAllergeni(new ArrayList<>());
+                }
+
                 lista.add(r);
             }
         }
@@ -250,11 +266,13 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
     public List<Ricetta> findByCorso(int idCorso) throws SQLException {
         List<Ricetta> ricette = new ArrayList<>();
         
-        String sql = "SELECT DISTINCT r.Id_Ricetta, r.Durata, r.Descrizione, r.Preparazione " +
-                     "FROM Ricetta r " +
-                     "JOIN Svolge s ON r.Id_Ricetta = s.FK_Ricetta " +
-                     "JOIN SessionePratica sp ON s.FK_SessionePratica = sp.Id_SessionePratica " +
-                     "WHERE sp.FK_Corso = ?";
+        String sql = """
+            SELECT DISTINCT r.id_ricetta, r.durata, r.descrizione, r.preparazione, r.allergeni 
+            FROM ricetta r 
+            JOIN svolge s ON r.id_ricetta = s.fk_ricetta 
+            JOIN sessionepratica sp ON s.fk_sessionepratica = sp.id_sessionepratica 
+            WHERE sp.fk_corso = ?
+        """;
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -262,12 +280,26 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             ps.setInt(1, idCorso);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("Id_Ricetta");
-                    int durata = rs.getInt("Durata");
-                    String descrizione = rs.getString("Descrizione");
-                    String preparazione = rs.getString("Preparazione");
+                    Ricetta r = new Ricetta(
+                        rs.getInt("id_ricetta"),
+                        rs.getInt("durata"),
+                        rs.getString("descrizione"),
+                        rs.getString("preparazione")
+                    );
                     
-                    Ricetta r = new Ricetta(id, durata, descrizione, preparazione);
+                    String allergeniStr = rs.getString("allergeni"); 
+                    if (allergeniStr != null && !allergeniStr.equals("{}")) {
+                        String pulita = allergeniStr.replace("{", "").replace("}", "");
+                        List<String> listaAllergeni = Arrays.asList(pulita.split(","));
+                        r.setAllergeni(listaAllergeni);
+                        System.out.println("DEBUG: Trovati allergeni per " + r.getId() + ": " + listaAllergeni);
+                    } else {
+                        r.setAllergeni(new ArrayList<>());
+                    }
+                    
+                    UtilizzoImpl uDAO = new UtilizzoImpl();
+                    r.setIngredienti(uDAO.findByRicetta(r.getId()));
+                    
                     ricette.add(r);
                 }
             }
@@ -280,7 +312,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
         Map<String,Integer> result = new HashMap<>();
 
         String sql = """
-            SELECT r.nome, COUNT(*) as utilizzi
+            SELECT r.descrizione, COUNT(*) as utilizzi
             FROM svolge s
             JOIN ricetta r ON s.fk_ricetta = r.id_ricetta
             GROUP BY r.nome
@@ -303,13 +335,12 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
     }
     
     public double getMediaRicettePerSessione() throws SQLException {
-
         String sql = """
             SELECT AVG(cnt)
             FROM (
-                SELECT COUNT(*) as cnt
-                FROM svolge
-                GROUP BY fk_sessione
+                SELECT COUNT(*) AS cnt
+                FROM Svolge
+                GROUP BY FK_SessionePratica
             ) t
         """;
         try(PreparedStatement ps = getConnection().prepareStatement(sql);
@@ -320,15 +351,14 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
         }
         return 0;
     }
-    
-    public int getMaxRicettePerSessione() throws SQLException {
 
+    public int getMaxRicettePerSessione() throws SQLException {
         String sql = """
             SELECT MAX(cnt)
             FROM (
-                SELECT COUNT(*) as cnt
-                FROM svolge
-                GROUP BY fk_sessione
+                SELECT COUNT(*) AS cnt
+                FROM Svolge
+                GROUP BY FK_SessionePratica
             ) t
         """;
         try(PreparedStatement ps = getConnection().prepareStatement(sql);
@@ -339,15 +369,14 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
         }
         return 0;
     }
-    
-    public int getMinRicettePerSessione() throws SQLException {
 
+    public int getMinRicettePerSessione() throws SQLException {
         String sql = """
             SELECT MIN(cnt)
             FROM (
-                SELECT COUNT(*) as cnt
-                FROM svolge
-                GROUP BY fk_sessione
+                SELECT COUNT(*) AS cnt
+                FROM Svolge
+                GROUP BY FK_SessionePratica
             ) t
         """;
         try(PreparedStatement ps = getConnection().prepareStatement(sql);

@@ -34,14 +34,18 @@ public class AggiungiSessioneOnlineFrame extends JFrame {
 	
 	
 	private Controller theController;
+	private GestioneSessioniFrame gestioneSessioniFrame;
+	private ChefDashboard chefDashboard;
 
 
 	/**
 	 * Create the frame.
 	 */
-	public AggiungiSessioneOnlineFrame(Controller c) {
+	public AggiungiSessioneOnlineFrame(Controller c, GestioneSessioniFrame gsFrame, ChefDashboard dashboard) {
 		
-		theController = c;
+		this.theController = c;
+		this.gestioneSessioniFrame = gsFrame;
+		this.chefDashboard = dashboard;
 		
 		setResizable(false);
 		setTitle("Aggiungi Sessione Online");
@@ -145,7 +149,6 @@ public class AggiungiSessioneOnlineFrame extends JFrame {
 	            Corso corso = (Corso) comboCorso.getSelectedItem();
 	            int durata = Integer.parseInt(textDurata.getText());
 	            int max = Integer.parseInt(textMax.getText());
-
 	            LocalDate data = LocalDate.parse(textData.getText());
 	            LocalTime ora = LocalTime.parse(textOra.getText());
 	            String link = textLink.getText();
@@ -156,8 +159,14 @@ public class AggiungiSessioneOnlineFrame extends JFrame {
 	            }
 
 	            theController.aggiungiSessioneOnline(0, durata, data, ora, link, corso, max);
-
-	            JOptionPane.showMessageDialog(this,"Sessione online creata!");
+	            JOptionPane.showMessageDialog(this,"Sessione online creata con successo!");
+	            
+	            if(gestioneSessioniFrame!= null) {
+	            	gestioneSessioniFrame.aggiornaTabellaSessioni();
+	            }
+	            if(chefDashboard!= null) {
+	            	chefDashboard.aggiornaTabellaSessioni();
+	            }
 	            dispose();
 
 	        } catch(Exception ex) {
@@ -169,11 +178,9 @@ public class AggiungiSessioneOnlineFrame extends JFrame {
 
 		    try {
 		        List<Corso> corsi = theController.getCorsiChef();
-
 		        for(Corso c : corsi) {
 		            comboCorso.addItem(c);
 		        }
-
 		    } catch(Exception e) {
 		        JOptionPane.showMessageDialog(this, e.getMessage());
 		    }

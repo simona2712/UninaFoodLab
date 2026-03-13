@@ -27,14 +27,16 @@ public class GestioneRicetteFrame extends JFrame {
 	private DefaultTableModel tableModel;
 	
 	private Controller theController;
+	private ChefDashboard chefDashboard;
 
 
 	/**
 	 * Create the frame.
 	 */
-	public GestioneRicetteFrame(Controller c) {
+	public GestioneRicetteFrame(Controller c, ChefDashboard dashboard) {
 		
-		theController= c;
+		this.theController= c;
+		this.chefDashboard=dashboard;
 		
 		setResizable(false);
 		setTitle("Gestione Ricette");
@@ -112,7 +114,7 @@ public class GestioneRicetteFrame extends JFrame {
 	}
 	
 	private void caricaRicette() {
-        try {
+		try {
             tableModel.setRowCount(0);
             List<Ricetta> ricette = theController.getRicetteChef();
             for(Ricetta r : ricette) {
@@ -127,5 +129,9 @@ public class GestioneRicetteFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Errore caricamento ricette: " + e.getMessage());
         }
     }
+	
+	public void aggiornaTabellaRicette() {
+	    caricaRicette();
+	}
 
 }

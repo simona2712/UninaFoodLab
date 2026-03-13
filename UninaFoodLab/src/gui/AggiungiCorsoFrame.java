@@ -77,7 +77,7 @@ public class AggiungiCorsoFrame extends JFrame {
 		
 		JLabel lblArgomento = new JLabel("Argomento");
 		lblArgomento.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		lblArgomento.setBounds(164, 108, 74, 24);
+		lblArgomento.setBounds(145, 108, 74, 24);
 		contentPane.add(lblArgomento);
 		
 		textFieldArgomento = new JTextField();
@@ -85,9 +85,9 @@ public class AggiungiCorsoFrame extends JFrame {
 		contentPane.add(textFieldArgomento);
 		textFieldArgomento.setColumns(10);
 		
-		JLabel lblDataInizio = new JLabel("Data inizio");
+		JLabel lblDataInizio = new JLabel("Data inizio (YYYY-MM-DD)");
 		lblDataInizio.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		lblDataInizio.setBounds(164, 142, 74, 24);
+		lblDataInizio.setBounds(145, 142, 193, 24);
 		contentPane.add(lblDataInizio);
 		
 		textFieldDataInizio = new JTextField();
@@ -97,13 +97,13 @@ public class AggiungiCorsoFrame extends JFrame {
 		
 		JLabel lblFrequenza = new JLabel("Frequenza");
 		lblFrequenza.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		lblFrequenza.setBounds(164, 176, 74, 24);
+		lblFrequenza.setBounds(145, 176, 74, 24);
 		contentPane.add(lblFrequenza);
 		
 		
 		comboBoxFrequenza = new JComboBox<>(new String[]{
 		        "Giornaliera",
-		        "Ogni 2 giorni",
+		        "Ogni due giorni",
 		        "Settimanale",
 		        "Mensile"
 		});
@@ -113,7 +113,7 @@ public class AggiungiCorsoFrame extends JFrame {
 		
 		lblNumeroSessioni = new JLabel("Numero Sessioni");
 		lblNumeroSessioni.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		lblNumeroSessioni.setBounds(164, 210, 128, 24);
+		lblNumeroSessioni.setBounds(145, 210, 128, 24);
 		contentPane.add(lblNumeroSessioni);
 		
 		textFieldNumeroSessioni = new JTextField();
@@ -123,7 +123,7 @@ public class AggiungiCorsoFrame extends JFrame {
 		
 		lblNome = new JLabel("Nome");
 		lblNome.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		lblNome.setBounds(164, 74, 74, 24);
+		lblNome.setBounds(145, 74, 74, 24);
 		contentPane.add(lblNome);
 		
 		textFieldNome = new JTextField();
@@ -208,19 +208,22 @@ public class AggiungiCorsoFrame extends JFrame {
 
 	        int giorni = switch(frequenza) {
 	            case "Giornaliera" -> 1;
-	            case "Ogni 2 giorni" -> 2;
+	            case "Ogni due giorni" -> 2;
 	            case "Settimanale" -> 7;
 	            case "Mensile" -> 30;
 	            default -> 1;
 	        };
 
 	        LocalDate dataFine = dataInizio.plusDays((long) (numSessioni - 1) * giorni);
-
-	        Corso corso = new Corso(0, nomeCorso, categoria, dataInizio, dataFine, frequenza, loggedChef);
+	        
+	        String frequenzaDB = mapFrequenzaToDB(frequenza); 
+	        
+	        Corso corso = new Corso(0, nomeCorso, categoria, dataInizio, dataFine, frequenzaDB, loggedChef);
 
 	        theController.creaCorso(corso);
 
 	        JOptionPane.showMessageDialog(this, "Corso creato con successo!");
+	        dashboard.aggiornaTabellaCorsi();
 	        dashboard.setVisible(true);
 	        dispose();
 
@@ -229,5 +232,15 @@ public class AggiungiCorsoFrame extends JFrame {
 	    } catch (ValidationException ex) {
 	        JOptionPane.showMessageDialog(this, "Errore validazione: " + ex.getMessage());
 	    }
+	}
+	
+	private String mapFrequenzaToDB(String frequenza) {
+	    return switch(frequenza) {
+	        case "Giornaliera" -> "Giornaliera";
+	        case "Ogni due giorni" -> "Ogni due giorni";
+	        case "Settimanale" -> "Settimanale";
+	        case "Mensile" -> "Mensile";
+	        default -> "Giornaliera";
+	    };
 	}
 }

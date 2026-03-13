@@ -34,14 +34,18 @@ public class AggiungiSessionePraticaFrame extends JFrame {
     private JTextField textMax;
 	
 	private Controller theController;
+	private GestioneSessioniFrame gestioneSessioniFrame;
+	private ChefDashboard chefDashboard;
 
 
 	/**
 	 * Create the frame.
 	 */
-	public AggiungiSessionePraticaFrame(Controller c) {
+	public AggiungiSessionePraticaFrame(Controller c, GestioneSessioniFrame gsFrame, ChefDashboard dashboard) {
 		
-		theController = c;
+		this.theController = c;
+		this.gestioneSessioniFrame = gsFrame;
+		this.chefDashboard = dashboard;
 		
 		setResizable(false);
 		setTitle("Aggiungi Sessione Pratica");
@@ -168,8 +172,14 @@ public class AggiungiSessionePraticaFrame extends JFrame {
             }
 
             theController.aggiungiSessionePratica(0, durata, data, ora, laboratorio, utensili, corso, max);
-
-            JOptionPane.showMessageDialog(this,"Sessione pratica creata!");
+            JOptionPane.showMessageDialog(this,"Sessione pratica creata con successo!");
+            
+            if(gestioneSessioniFrame!= null) {
+            	gestioneSessioniFrame.aggiornaTabellaSessioni();
+            }
+            if(chefDashboard!= null) {
+            	chefDashboard.aggiornaTabellaSessioni();
+            }
             dispose();
 
         } catch(Exception ex) {

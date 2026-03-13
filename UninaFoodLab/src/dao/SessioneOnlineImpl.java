@@ -19,7 +19,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
 
         String sql = """
             INSERT INTO sessioneonline
-            (durata, data, ora, fk_corso, link_riunione, max_partecipanti)
+            (durata, data, ora, fk_corso, linkriunione, max_partecipanti)
             VALUES (?,?,?,?,?,?)
         """;
 
@@ -64,7 +64,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
                         rs.getDate("data").toLocalDate(),
                         rs.getTime("ora").toLocalTime(),
                         corso,
-                        rs.getString("link_riunione"),
+                        rs.getString("linkriunione"),
                         rs.getInt("max_partecipanti")
                 );
             }
@@ -81,7 +81,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
         String sql = """
             UPDATE sessioneonline
             SET durata=?, data=?, ora=?, fk_corso=?,
-                link_riunione=?, max_partecipanti=?
+                linkriunione=?, max_partecipanti=?
             WHERE id_sessioneonline=?
         """;
 
@@ -133,7 +133,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
                        rs.getDate("data").toLocalDate(),
                        rs.getTime("ora").toLocalTime(),
                        corso,
-                       rs.getString("link_riunione"),
+                       rs.getString("linkriunione"),
                        rs.getInt("max_partecipanti")
                    );
                    
@@ -164,7 +164,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
                         rs.getDate("data").toLocalDate(),
                         rs.getTime("ora").toLocalTime(),
                         corso,
-                        rs.getString("link_riunione"),
+                        rs.getString("linkriunione"),
                         rs.getInt("max_partecipanti")
                     );
                     lista.add(s);
@@ -205,7 +205,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
                         rs.getDate("data").toLocalDate(),
                         rs.getTime("ora").toLocalTime(),
                         corso,
-                        rs.getString("link_riunione"),
+                        rs.getString("linkriunione"),
                         rs.getInt("max_partecipanti")
                     );
 
@@ -220,7 +220,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     public List<SessioneOnline> findByChef(int idChef) throws SQLException {
         List<SessioneOnline> sessioni = new ArrayList<>();
         
-        String sql = "SELECT so.id, so.durata, so.data, so.ora, so.link, so.max_partecipanti, so.id_corso " +
+        String sql = "SELECT so.id_sessioneonline, so.durata, so.data, so.ora, so.linkriunione, so.max_partecipanti, so.fk_corso " +
                      "FROM sessioneonline so " +
                      "JOIN corso c ON so.fk_corso = c.id_corso " +
                      "WHERE c.fk_chef = ?";
@@ -231,14 +231,14 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
             ps.setInt(1, idChef);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("id");
+                    int id = rs.getInt("id_sessioneonline");
                     int durata = rs.getInt("durata");
                     LocalDate data = rs.getDate("data").toLocalDate();
                     LocalTime ora = rs.getTime("ora").toLocalTime();
-                    String link = rs.getString("link");
+                    String link = rs.getString("linkriunione");
                     int max = rs.getInt("max_partecipanti");
                     
-                    int idCorso = rs.getInt("id_corso");
+                    int idCorso = rs.getInt("fk_corso");
                     Corso corso = new CorsoImpl().read(idCorso);
                     
                     SessioneOnline s = new SessioneOnline(id, durata, data, ora, corso, link, max);
@@ -251,7 +251,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     
     public int countSessioniOnline() throws SQLException {
 
-        String sql = "SELECT COUNT(*) FROM sessioneOnline";
+        String sql = "SELECT COUNT(*) FROM sessioneonline";
         try(PreparedStatement ps = getConnection().prepareStatement(sql);
             ResultSet rs = ps.executeQuery()) {
 

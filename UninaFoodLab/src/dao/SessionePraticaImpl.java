@@ -18,7 +18,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
         SessionePratica s = (SessionePratica) o;
 
         String sql = """
-            INSERT INTO sessionpratica
+            INSERT INTO sessionepratica
             (durata, data, ora, fk_corso, laboratorio, max_partecipanti, utensili)
             VALUES (?,?,?,?,?,?,?)
         """;
@@ -203,7 +203,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
     public List<SessionePratica> findByChef(int idChef) throws SQLException {
         List<SessionePratica> sessioni = new ArrayList<>();
         
-        String sql = "SELECT sp.id, sp.durata, sp.data, sp.ora, sp.laboratorio, sp.utensili, sp.max_partecipanti, sp.id_corso " +
+        String sql = "SELECT sp.id_sessionepratica, sp.durata, sp.data, sp.ora, sp.laboratorio, sp.utensili, sp.max_partecipanti, sp.fk_corso " +
                      "FROM sessionepratica sp " +
                      "JOIN corso c ON sp.fk_corso = c.id_corso " +
                      "WHERE c.fk_chef = ?";
@@ -214,7 +214,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
             ps.setInt(1, idChef);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("id");
+                    int id = rs.getInt("id_sessionepratica");
                     int durata = rs.getInt("durata");
                     LocalDate data = rs.getDate("data").toLocalDate();
                     LocalTime ora = rs.getTime("ora").toLocalTime();
@@ -222,7 +222,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
                     String utensili = rs.getString("utensili");
                     int max = rs.getInt("max_partecipanti");
                     
-                    int idCorso = rs.getInt("id_corso");
+                    int idCorso = rs.getInt("fk_corso");
                     Corso corso = new CorsoImpl().read(idCorso);
                     
                     SessionePratica s = new SessionePratica(id, durata, data, ora, corso, max, utensili, laboratorio);
