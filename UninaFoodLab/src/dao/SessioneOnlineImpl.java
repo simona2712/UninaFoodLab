@@ -18,7 +18,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
         SessioneOnline s = (SessioneOnline) o;
 
         String sql = """
-            INSERT INTO sessione_online
+            INSERT INTO sessioneonline
             (durata, data, ora, fk_corso, link_riunione, max_partecipanti)
             VALUES (?,?,?,?,?,?)
         """;
@@ -46,7 +46,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     @Override
     public SessioneOnline read(int id) throws SQLException {
 
-        String sql = "SELECT * FROM sessione_online WHERE id_sessioneonline=?";
+        String sql = "SELECT * FROM sessioneonline WHERE id_sessioneonline=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
@@ -79,7 +79,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
         SessioneOnline s = (SessioneOnline) o;
 
         String sql = """
-            UPDATE sessione_online
+            UPDATE sessioneonline
             SET durata=?, data=?, ora=?, fk_corso=?,
                 link_riunione=?, max_partecipanti=?
             WHERE id_sessioneonline=?
@@ -102,7 +102,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     @Override
     public void delete(int id) throws SQLException {
 
-        String sql = "DELETE FROM sessione_online WHERE id_sessioneonline=?";
+        String sql = "DELETE FROM sessioneonline WHERE id_sessioneonline=?";
         
         Connection conn = getConnection(); 
 
@@ -115,7 +115,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     public List<SessioneOnline> findAll() throws SQLException {
         List<SessioneOnline> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM sessione_online";
+        String sql = "SELECT * FROM sessioneonline";
         
         CorsoImpl corsoDAO = new CorsoImpl();
 
@@ -145,7 +145,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
     
     public List<SessioneOnline> findByCorso(int idCorso) throws SQLException {
         List<SessioneOnline> lista = new ArrayList<>();
-        String sql = "SELECT * FROM sessione_online WHERE fk_corso = ? ORDER BY data ASC, ora ASC";
+        String sql = "SELECT * FROM sessioneonline WHERE fk_corso = ? ORDER BY data ASC, ora ASC";
 
         CorsoDAO corsoDAO = new CorsoImpl();
         Corso corso = (Corso) corsoDAO.read(idCorso);
@@ -180,7 +180,7 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
 
         String sql = """
             SELECT * 
-            FROM sessione_online
+            FROM sessioneonline
             WHERE fk_corso = ?
             AND data >= CURRENT_DATE
             ORDER BY data ASC, ora ASC
@@ -247,5 +247,19 @@ public class SessioneOnlineImpl extends GenericImpl<SessioneOnline> implements S
             }
         }
         return sessioni;
+    }
+    
+    public int countSessioniOnline() throws SQLException {
+
+        String sql = "SELECT COUNT(*) FROM sessioneOnline";
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        return 0;
     }
 }

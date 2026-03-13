@@ -18,7 +18,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
         SessionePratica s = (SessionePratica) o;
 
         String sql = """
-            INSERT INTO sessione_pratica
+            INSERT INTO sessionpratica
             (durata, data, ora, fk_corso, laboratorio, max_partecipanti, utensili)
             VALUES (?,?,?,?,?,?,?)
         """;
@@ -47,7 +47,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
     @Override
     public SessionePratica read(int id) throws SQLException {
 
-        String sql = "SELECT * FROM sessione_pratica WHERE id_sessionepratica=?";
+        String sql = "SELECT * FROM sessionepratica WHERE id_sessionepratica=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
@@ -85,7 +85,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
         SessionePratica s = (SessionePratica) o;
 
         String sql = """
-            UPDATE sessione_pratica
+            UPDATE sessionepratica
             SET durata=?, data=?, ora=?, fk_corso=?,
                 laboratorio=?, max_partecipanti=?, utensili=?
             WHERE id_sessionepratica=?
@@ -109,7 +109,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
     @Override
     public void delete(int id) throws SQLException {
 
-        String sql = "DELETE FROM sessione_pratica WHERE id_sessionepratica=?";
+        String sql = "DELETE FROM sessionepratica WHERE id_sessionepratica=?";
         
         Connection conn = getConnection(); 
 
@@ -122,7 +122,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
     public List<SessionePratica> findAll() throws SQLException {
         List<SessionePratica> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM sessione_pratica";
+        String sql = "SELECT * FROM sessionepratica";
         CorsoImpl corsoDAO = new CorsoImpl();
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
@@ -164,7 +164,7 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
 
         String sql = """
             SELECT * 
-            FROM sessione_pratica
+            FROM sessionepratica
             WHERE fk_corso = ? AND data > CURRENT_DATE
             ORDER BY data
         """;
@@ -231,5 +231,35 @@ public class SessionePraticaImpl extends GenericImpl<SessionePratica> implements
             }
         }
         return sessioni;
+    }
+    
+    public int countByCorso(int idCorso) throws SQLException {
+
+        String sql = "SELECT COUNT(*) FROM sessionepratica WHERE fk_corso = ?";
+        int count = 0;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, idCorso);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        }
+        return count;
+    }
+    
+    public int countSessioniPratiche() throws SQLException {
+
+        String sql = "SELECT COUNT(*) FROM sessionepratica";
+
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+
+        return 0;
     }
 }

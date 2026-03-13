@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dao.*;
 
@@ -161,6 +163,10 @@ public class Controller {
         return corsoDAO.findByChef(loggedChef);
     }
     
+    public int getNumeroCorsiTotali() throws SQLException {
+        return corsoDAO.countCorsiTotali();
+    }
+    
     
 
     
@@ -213,6 +219,18 @@ public class Controller {
         adesioneDAO.iscriviSessioneOnline(idAllievo, idSessione);
     }
     
+    public Map<String,Integer> getNumeroSessioniOnlinePratiche() throws SQLException {
+
+        Map<String,Integer> result = new HashMap<>();
+
+        int online = sessioneOnlineDAO.countSessioniOnline();
+        int pratiche = sessionePraticaDAO.countSessioniPratiche();
+
+        result.put("Online", online);
+        result.put("Pratiche", pratiche);
+
+        return result;
+    }
     
     
  // ---------------- SESSIONI PRATICHE ----------------
@@ -257,8 +275,53 @@ public class Controller {
         ricettaDAO.associaASessionePratica(idRicetta, idSessione);
     }
     
+    public Map<String,Integer> getNumeroSessioniPerCorso() throws SQLException {
+
+        Map<String,Integer> result = new HashMap<>();
+
+        List<Corso> corsi = corsoDAO.findAll();
+
+        for(Corso c : corsi) {
+
+            int count = sessionePraticaDAO.countByCorso(c.getId());
+            result.put(c.getNome(), count);
+
+        }
+
+        return result;
+    }
     
+    public Map<String,Integer> getPresenzeAssenze() throws SQLException {
+
+        Map<String,Integer> result = new HashMap<>();
+
+        int presenti = adesioneDAO.countPresenti();
+        int assenti = adesioneDAO.countAssenti();
+
+        result.put("presenti", presenti);
+        result.put("assenti", assenti);
+
+        return result;
+    }
     
+    public Map<String,Integer> getPartecipantiPerSessione() throws SQLException {
+
+        Map<String,Integer> result = new HashMap<>();
+
+        List<SessionePratica> sessioni = sessionePraticaDAO.findAll();
+
+        for(SessionePratica s : sessioni) {
+
+            int count = adesioneDAO.countBySessione(s.getId());
+
+            String nome = "Sessione " + s.getId() + " - " + s.getData();
+
+            result.put(nome, count);
+        }
+
+        return result;
+    }
+
     
  // ---------------- ISCRIZIONI ----------------
     public void iscriviAllievoACorso(int idAllievo, int idCorso)
@@ -371,7 +434,20 @@ public class Controller {
         return true;
     }
     
+    public Map<String,Integer> getTopRicetteUsate() throws SQLException {
+        return ricettaDAO.getTopRicetteUsate();
+    }
     
+    public Map<String,Double> getStatisticheRicetteSessione() throws SQLException {
+
+        Map<String,Double> result = new HashMap<>();
+
+        result.put("Media", ricettaDAO.getMediaRicettePerSessione());
+        result.put("Max", (double) ricettaDAO.getMaxRicettePerSessione());
+        result.put("Min", (double) ricettaDAO.getMinRicettePerSessione());
+
+        return result;
+    }
     
  // ---------------- ALLIEVO ---------------- 
     public void registraAllievo(String nome, String cognome, String telefono,

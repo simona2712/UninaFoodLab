@@ -57,7 +57,7 @@ public class LoginPage extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		lblEmail.setFont(new Font("SansSerif", Font.PLAIN, 17));
 		lblEmail.setBackground(new Color(240, 240, 240));
 		lblEmail.setBounds(403, 82, 78, 32);
 		contentPane.add(lblEmail);
@@ -68,7 +68,7 @@ public class LoginPage extends JFrame {
 		textField.setColumns(10);
 		
 		JLabel lblPassword = new JLabel("Password");
-		lblPassword.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		lblPassword.setFont(new Font("SansSerif", Font.PLAIN, 17));
 		lblPassword.setBackground(UIManager.getColor("Button.background"));
 		lblPassword.setBounds(403, 138, 88, 32);
 		contentPane.add(lblPassword);

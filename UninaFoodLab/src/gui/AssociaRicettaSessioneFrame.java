@@ -3,6 +3,7 @@ package gui;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -49,22 +50,22 @@ public class AssociaRicettaSessioneFrame extends JFrame {
 		JLabel titolo = new JLabel("Aggiungi Ricetta a Sessione");
         titolo.setForeground(new Color(0, 128, 0));
         titolo.setFont(new Font("SansSerif", Font.BOLD, 20));
-        titolo.setBounds(182, 10, 350, 30);
+        titolo.setBounds(186, 36, 350, 30);
         contentPane.add(titolo);
 
         JLabel lblSessioni = new JLabel("Seleziona Sessione Pratica:");
         lblSessioni.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblSessioni.setBounds(50, 80, 200, 25);
+        lblSessioni.setBounds(48, 117, 200, 25);
         contentPane.add(lblSessioni);
 
         comboSessioni = new JComboBox<>();
-        comboSessioni.setBounds(250, 80, 300, 25);
+        comboSessioni.setBounds(251, 119, 300, 25);
         contentPane.add(comboSessioni);
 
         btnAssocia = new JButton("Associa");
         btnAssocia.setFont(new Font("SansSerif", Font.PLAIN, 14));
         btnAssocia.setBackground(new Color(253, 171, 117));
-        btnAssocia.setBounds(250, 140, 120, 30);
+        btnAssocia.setBounds(257, 173, 120, 30);
         contentPane.add(btnAssocia);
 
         btnAssocia.addActionListener(e -> {
@@ -81,6 +82,18 @@ public class AssociaRicettaSessioneFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Seleziona una sessione!");
             }
         });
+        
+        ImageIcon icon = new ImageIcon(getClass().getResource("/img/U_F_L_1.png"));
+
+        Image img = icon.getImage();
+        Image imgRidimensionata = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+
+        ImageIcon iconRidimensionata = new ImageIcon(imgRidimensionata);
+
+        JLabel label = new JLabel(iconRidimensionata);
+        label.setBounds(513, 192, 134, 113);
+
+        getContentPane().add(label);
 
         caricaSessioni();
         setVisible(true);

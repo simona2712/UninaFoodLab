@@ -107,10 +107,7 @@ public class SessionePratica extends Sessione{
     
     @Override
     public String toString() {
-        return "Sessione Pratica | " +
-               super.toString() +
-               " | Partecipanti: " + adesioni.size() + "/" + maxPartecipanti +
-               " | Laboratorio: " + laboratorio;
+        return getCorso().getNome() + " | " + getData() + " | " + getOra();
     }
 
 }

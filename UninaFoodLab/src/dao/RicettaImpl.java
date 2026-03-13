@@ -3,7 +3,9 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import database.DBConnection;
@@ -271,5 +273,89 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             }
         }
         return ricette;
+    }
+    
+    public Map<String,Integer> getTopRicetteUsate() throws SQLException {
+
+        Map<String,Integer> result = new HashMap<>();
+
+        String sql = """
+            SELECT r.nome, COUNT(*) as utilizzi
+            FROM svolge s
+            JOIN ricetta r ON s.fk_ricetta = r.id_ricetta
+            GROUP BY r.nome
+            ORDER BY utilizzi DESC
+            LIMIT 5
+        """;
+
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+
+            while(rs.next()) {
+                String nome = rs.getString("nome");
+                int count = rs.getInt("utilizzi");
+
+                result.put(nome, count);
+            }
+        }
+
+        return result;
+    }
+    
+    public double getMediaRicettePerSessione() throws SQLException {
+
+        String sql = """
+            SELECT AVG(cnt)
+            FROM (
+                SELECT COUNT(*) as cnt
+                FROM svolge
+                GROUP BY fk_sessione
+            ) t
+        """;
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()) {
+                return rs.getDouble(1);
+            }
+        }
+        return 0;
+    }
+    
+    public int getMaxRicettePerSessione() throws SQLException {
+
+        String sql = """
+            SELECT MAX(cnt)
+            FROM (
+                SELECT COUNT(*) as cnt
+                FROM svolge
+                GROUP BY fk_sessione
+            ) t
+        """;
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+    
+    public int getMinRicettePerSessione() throws SQLException {
+
+        String sql = """
+            SELECT MIN(cnt)
+            FROM (
+                SELECT COUNT(*) as cnt
+                FROM svolge
+                GROUP BY fk_sessione
+            ) t
+        """;
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 }

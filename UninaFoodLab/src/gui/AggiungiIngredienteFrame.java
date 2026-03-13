@@ -51,7 +51,7 @@ public class AggiungiIngredienteFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JLabel titolo = new JLabel("Aggiungi ingrediente alla Ricetta");
+		JLabel titolo = new JLabel("Aggiungi Ingrediente alla Ricetta");
 		titolo.setForeground(new Color(0, 128, 0));
 		titolo.setFont(new Font("SansSerif",Font.BOLD,20));
 		titolo.setBounds(169,33,329,30);

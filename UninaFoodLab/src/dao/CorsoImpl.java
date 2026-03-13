@@ -220,4 +220,16 @@ public class CorsoImpl extends GenericImpl<Corso> implements CorsoDAO{
         return lista;
     }
     
+    public int countCorsiTotali() throws SQLException {
+
+        String sql = "SELECT COUNT(*) FROM corso";
+        try(PreparedStatement ps = getConnection().prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            if(rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+    
 }

@@ -9,4 +9,6 @@ public interface SessionePraticaDAO extends GenericDAO<SessionePratica> {
     void associaRicetta(int idSessione, int idRicetta) throws SQLException;
     List<SessionePratica> findFutureByCorso(int idCorso) throws SQLException;
     List<SessionePratica> findByChef(int idChef) throws SQLException;
+    int countByCorso(int idCorso) throws SQLException;
+    int countSessioniPratiche() throws SQLException;
 }

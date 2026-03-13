@@ -10,4 +10,5 @@ public interface CorsoDAO extends GenericDAO<Corso> {
     List<Corso> findByArgomento(String argomento) throws SQLException;
     List<Corso> findCorsiByAllievo(int idAllievo) throws SQLException;
     List<Corso> findByChef(Chef chef) throws SQLException;
+    int countCorsiTotali() throws SQLException;
 }
