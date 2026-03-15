@@ -371,6 +371,10 @@ public class Controller {
         creaNotifica(n);
     }
     
+    public Notifica getNotificaById(int id) throws Exception {
+        return notificaDAO.read(id);
+    }
+    
     
     
  // ---------------- ALLERGIE ----------------

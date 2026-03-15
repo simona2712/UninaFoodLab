@@ -34,14 +34,17 @@ public class NotificheFrame extends JFrame {
 	private JRadioButton radioTutti;
 	
 	private Controller theController;
+	private ChefDashboard chefDashboard;
 
 
 	/**
 	 * Create the frame.
 	 */
-	public NotificheFrame(Controller c) {
+	public NotificheFrame(Controller c, ChefDashboard dashboard) {
 		
 		theController= c;
+		this.chefDashboard=dashboard;
+		
 		
 		setResizable(false);
 		setTitle("Invia Notifica");
@@ -119,25 +122,30 @@ public class NotificheFrame extends JFrame {
 	}
 	
 	private void inviaNotifica() {
-        String testo = textMessaggio.getText().trim();
-        if (testo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inserisci un messaggio");
-            return;
-        }
+	    String testo = textMessaggio.getText().trim();
+	    if (testo.isEmpty()) {
+	        JOptionPane.showMessageDialog(this, "Inserisci un messaggio");
+	        return;
+	    }
 
-        try {
-            if (radioTutti.isSelected()) {
-                theController.inviaNotificaATutti(testo);
-            } else {
-                Corso corso = (Corso) comboCorsi.getSelectedItem();
-                theController.inviaNotificaCorso(corso, testo);
-            }
-            JOptionPane.showMessageDialog(this, "Notifica inviata");
-            dispose();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
-        }
-    }
+	    try {
+	        if (radioTutti.isSelected()) {
+	            theController.inviaNotificaATutti(testo);
+	        } else {
+	            Corso corso = (Corso) comboCorsi.getSelectedItem();
+	            theController.inviaNotificaCorso(corso, testo);
+	        }
+
+	        JOptionPane.showMessageDialog(this, "Notifica inviata");
+
+	        chefDashboard.aggiornaTabellaNotifiche();
+
+	        dispose();
+
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(this, "Errore: " + ex.getMessage());
+	    }
+	}
 
     private void caricaCorsi() {
         try {

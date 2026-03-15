@@ -108,18 +108,47 @@ public class ChefDashboard extends JFrame {
 
         JButton btnFiltraArgomento = new JButton("Filtra Argomento");
         btnFiltraArgomento.addActionListener(e -> {
-            String argomento = JOptionPane.showInputDialog(this, "Inserisci argomento");
-            if (argomento != null) {
-                DefaultTableModel model = (DefaultTableModel) tableCorsi.getModel();
-                model.setRowCount(0);
-                try {
-                    List<Corso> corsiFiltrati = theController.filtraCorsiPerArgomento(argomento);
-                    for (Corso co : corsiFiltrati) {
-                        model.addRow(new Object[]{co.getId(), co.getNome(), co.getArgomento(), co.getDataInizio()});
-                    }
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage());
+            try {
+
+                List<Corso> corsi = theController.getCorsiChef();
+
+                java.util.Set<String> argomentiSet = new java.util.HashSet<>();
+
+                for (Corso cor : corsi) {
+                    argomentiSet.add(cor.getArgomento());
                 }
+
+                String[] argomenti = argomentiSet.toArray(new String[0]);
+
+                String scelta = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Seleziona un argomento",
+                        "Filtra Corsi",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        argomenti,
+                        argomenti[0]
+                );
+
+                if (scelta != null) {
+
+                    DefaultTableModel model = (DefaultTableModel) tableCorsi.getModel();
+                    model.setRowCount(0);
+
+                    List<Corso> corsiFiltrati = theController.filtraCorsiPerArgomento(scelta);
+
+                    for (Corso cor : corsiFiltrati) {
+                        model.addRow(new Object[]{
+                                cor.getId(),
+                                cor.getNome(),
+                                cor.getArgomento(),
+                                cor.getDataInizio()
+                        });
+                    }
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
             }
         });
         
@@ -250,13 +279,28 @@ public class ChefDashboard extends JFrame {
         JPanel panelBottoniNotifiche = new JPanel();
 
         JButton btnNuovaNotifica = new JButton("Crea Notifica");
-        btnNuovaNotifica.addActionListener(e -> new NotificheFrame(theController).setVisible(true));
+        btnNuovaNotifica.addActionListener(e -> new NotificheFrame(theController, ChefDashboard.this).setVisible(true));
 
         panelBottoniNotifiche.add(btnNuovaNotifica);
         panelNotifiche.add(panelBottoniNotifiche, BorderLayout.SOUTH);
 
         tabbedPane.addTab("Notifiche", panelNotifiche);
         caricaNotifiche();
+        
+        tableNotifiche.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+
+                int riga = tableNotifiche.rowAtPoint(evt.getPoint());
+
+                if (riga >= 0) {
+
+                    int idNotifica = (int) tableNotifiche.getValueAt(riga, 0);
+
+                    new NotificaDettaglioFrame(theController, idNotifica);
+
+                }
+            }
+        });
         
 	}
 	
@@ -339,10 +383,17 @@ public class ChefDashboard extends JFrame {
         try {
             DefaultTableModel model = (DefaultTableModel) tableNotifiche.getModel();
             model.setRowCount(0);
+            
             for (Notifica n : theController.getNotificheChef(loggedChef.getId())) {
+            	String testo = n.getTesto();
+
+                String preview = testo.length() > 40
+                        ? testo.substring(0,40) + "..."
+                        : testo;
+                
                 model.addRow(new Object[]{
                         n.getId(),
-                        n.getTesto(),
+                        preview,
                         n.getDataCreazione()
                 });
             }
@@ -361,5 +412,9 @@ public class ChefDashboard extends JFrame {
 	
 	public void aggiornaTabellaRicette() {
 	    caricaRicette();
+	}
+	
+	public void aggiornaTabellaNotifiche() {
+	    caricaNotifiche();
 	}
 }
