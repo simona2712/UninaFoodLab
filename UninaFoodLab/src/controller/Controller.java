@@ -25,7 +25,6 @@ public class Controller {
     private RicettaDAO ricettaDAO = new RicettaImpl();
     private NotificaDAO notificaDAO = new NotificaImpl();
     private IngredienteDAO ingredienteDAO = new IngredienteImpl();
-    private AllergiaDAO allergiaDAO = new AllergiaImpl();
     private AdesioneDAO adesioneDAO = new AdesioneImpl();
     
     private Chef loggedChef;
@@ -140,19 +139,8 @@ public class Controller {
         corsoDAO.create(corso);
     }
 
-    public List<Corso> getTuttiCorsi() throws SQLException {
-        return corsoDAO.findAll();
-    }
-
     public List<Corso> filtraCorsiPerArgomento(String argomento) throws SQLException {
         return corsoDAO.findByArgomento(argomento);
-    }
-
-    public List<SessioneOnline> getSessioniOnlineCorso(int idCorso) throws SQLException, EntityNotFoundException {
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null)
-            throw new EntityNotFoundException("Corso non trovato");
-        return sessioneOnlineDAO.findByCorso(idCorso);
     }
     
     public List<Corso> getCorsiChef() throws SQLException {
@@ -163,8 +151,7 @@ public class Controller {
         return corsoDAO.countCorsiTotali();
     }
     
-    
-
+   
     
  // ---------------- SESSIONI ONLINE ----------------
     public void aggiungiSessioneOnline(int id, int durata, LocalDate data, LocalTime ora, 
@@ -187,13 +174,6 @@ public class Controller {
         sessioneOnlineDAO.create(sessioneOnline);
     }
 
-    public List<SessioneOnline> getSessioniOnlineFuture(int idCorso) throws SQLException, EntityNotFoundException {
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null)
-            throw new EntityNotFoundException("Corso non trovato");
-
-        return sessioneOnlineDAO.findFutureByCorso(idCorso);
-    }
 
     public void iscriviASessioneOnline(int idAllievo, int idSessione)
             throws SQLException, EntityNotFoundException, DuplicateEntityException, InvalidOperationException {
@@ -319,30 +299,6 @@ public class Controller {
     }
 
     
- // ---------------- ISCRIZIONI ----------------
-    public void iscriviAllievoACorso(int idAllievo, int idCorso)
-            throws SQLException, EntityNotFoundException, DuplicateEntityException {
-
-        Allievo a = allievoDAO.read(idAllievo);
-        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
-
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null) throw new EntityNotFoundException("Corso non trovato");
-
-        int count = adesioneDAO.countAdesioniByAllievoAndCorso(idAllievo, idCorso);
-        if (count > 0)
-            throw new DuplicateEntityException("Allievo già iscritto al corso");
-
-        allievoDAO.iscriviACorso(idAllievo, idCorso);
-    }
-
-    public int numeroIscrittiCorso(int idCorso) throws SQLException, EntityNotFoundException {
-        Corso c = corsoDAO.read(idCorso);
-        if (c == null) throw new EntityNotFoundException("Corso non trovato");
-        return adesioneDAO.countAdesioniByCorso(idCorso);
-    }
-
-    
 
     // ---------------- NOTIFICHE ----------------
     public void creaNotifica(Notifica n) throws SQLException, ValidationException {
@@ -374,35 +330,18 @@ public class Controller {
     public Notifica getNotificaById(int id) throws Exception {
         return notificaDAO.read(id);
     }
-    
-    
-    
- // ---------------- ALLERGIE ----------------
-    public void aggiungiAllergiaAAllievo(int idAllievo, int idAllergia)
-            throws SQLException, EntityNotFoundException {
-
-        Allievo a = allievoDAO.read(idAllievo);
-        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
-
-        Allergia all = allergiaDAO.read(idAllergia);
-        if (all == null) throw new EntityNotFoundException("Allergia non trovata");
-
-        allievoDAO.aggiungiAllergia(idAllievo, idAllergia);
-    }
  
     
  // ---------------- RICETTE ----------------
-    public List<Ricetta> getRicetteSessione(int idSessione) throws SQLException, EntityNotFoundException {
-        SessionePratica s = sessionePraticaDAO.read(idSessione);
-        if (s == null) throw new EntityNotFoundException("Sessione non trovata");
-        return ricettaDAO.findBySessionePratica(idSessione);
-    }
 
-    public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita)
+    public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita, String unita)
             throws SQLException, EntityNotFoundException, ValidationException {
 
-        if (quantita <= 0)
+    	if (quantita <= 0)
             throw new ValidationException("Quantità deve essere maggiore di zero");
+
+        if (unita == null || unita.isBlank())
+            throw new ValidationException("Unità di misura obbligatoria");
 
         Ricetta r = ricettaDAO.read(idRicetta);
         if (r == null) throw new EntityNotFoundException("Ricetta non trovata");
@@ -410,28 +349,7 @@ public class Controller {
         Ingrediente i = ingredienteDAO.read(idIngrediente);
         if (i == null) throw new EntityNotFoundException("Ingrediente non trovato");
 
-        ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita);
-    }
-
-    public boolean ricettaCompatibileConAllievo(int idRicetta, int idAllievo)
-            throws SQLException, EntityNotFoundException {
-
-        Ricetta r = ricettaDAO.read(idRicetta);
-        if (r == null) throw new EntityNotFoundException("Ricetta non trovata");
-
-        Allievo a = allievoDAO.read(idAllievo);
-        if (a == null) throw new EntityNotFoundException("Allievo non trovato");
-
-        List<Ingrediente> ingredienti = ingredienteDAO.findByRicetta(idRicetta);
-        List<Allergia> allergie = allergiaDAO.findByAllievo(idAllievo);
-
-        for (Ingrediente i : ingredienti) {
-            for (Allergia al : allergie) {
-                if (i.getNome().equalsIgnoreCase(al.getNome()))
-                    return false;
-            }
-        }
-        return true;
+        ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita, unita);
     }
     
     public Map<String,Integer> getTopRicetteUsate() throws SQLException {
@@ -503,7 +421,5 @@ public class Controller {
         ingredienteDAO.create(i);
         return i.getId();
     }
-    
-    
     
 }

@@ -19,7 +19,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
 
         String sql = """
             INSERT INTO ricetta (durata, descrizione, preparazione, allergeni)
-            VALUES (?, ?, ?::tipo_prep, ?::tipo_allergeni[])
+            VALUES (?, ?, ?::tipo_prep, ?::tipo_allergeni)
         """;
         
 
@@ -27,12 +27,11 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             ps.setInt(1, r.getDurata());
             ps.setString(2, r.getDescrizione());
             ps.setString(3, r.getPreparazione());
+            
             if (r.getAllergeni() != null && !r.getAllergeni().isEmpty()) {
-                Object[] allergeniArray = r.getAllergeni().toArray();
-                Array sqlArray = getConnection().createArrayOf("tipo_allergeni", allergeniArray);
-                ps.setArray(4, sqlArray);
+                ps.setString(4, r.getAllergeni().get(0));
             } else {
-                ps.setNull(4, Types.ARRAY);
+                ps.setNull(4, Types.VARCHAR);
             }
 
             ps.executeUpdate();
@@ -211,7 +210,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
     public void iscriviSessioneOnline(int idAllievo, int idSessione) throws SQLException {
 
         String sql = """
-            INSERT INTO adesione (presenza, data_adesione, fk_allievo, fk_sessionepratica)
+            INSERT INTO adesione (presenza, data_adesione, fk_allievo, fk_sessioneonline)
             VALUES (?, CURRENT_DATE, ?, ?)
         """;
 
@@ -225,7 +224,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
         }
     }
     
-    public void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException {
+    public void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita, String unita) throws SQLException {
 
         if (idRicetta <= 0 || idIngrediente <= 0)
             throw new IllegalArgumentException("ID non validi");
@@ -248,8 +247,8 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
         }
 
         String insertSql = """
-            INSERT INTO utilizzo (fk_ricetta, fk_ingrediente, quantita)
-            VALUES (?, ?, ?)
+            INSERT INTO utilizzo (fk_ricetta, fk_ingrediente, quantita, unita_misura)
+            VALUES (?, ?, ?, ?)
         """;
 
         try (PreparedStatement ps = getConnection().prepareStatement(insertSql)) {
@@ -257,6 +256,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             ps.setInt(1, idRicetta);
             ps.setInt(2, idIngrediente);
             ps.setDouble(3, quantita);
+            ps.setString(4, unita);
 
             ps.executeUpdate();
         }
@@ -315,7 +315,7 @@ public class RicettaImpl extends GenericImpl<Ricetta> implements RicettaDAO{
             SELECT r.descrizione, COUNT(*) as utilizzi
             FROM svolge s
             JOIN ricetta r ON s.fk_ricetta = r.id_ricetta
-            GROUP BY r.nome
+            GROUP BY r.descrizione
             ORDER BY utilizzi DESC
             LIMIT 5
         """;

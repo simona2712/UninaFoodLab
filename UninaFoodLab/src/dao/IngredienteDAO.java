@@ -7,6 +7,5 @@ import java.util.List;
 public interface IngredienteDAO extends GenericDAO<Ingrediente> {
     List<Ingrediente> findAll() throws SQLException;
     List<Ingrediente> findByNome(String nome) throws SQLException;
-    void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException;
     List<Ingrediente> findByRicetta(int idRicetta) throws SQLException;
 }

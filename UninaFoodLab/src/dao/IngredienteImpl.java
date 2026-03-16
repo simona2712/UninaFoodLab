@@ -133,22 +133,6 @@ public class IngredienteImpl extends GenericImpl<Ingrediente> implements Ingredi
         return lista;
     }
     
-    public void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException {
-
-        String sql = """
-            INSERT INTO utilizzo (fk_ricetta, fk_ingrediente, quantita)
-            VALUES (?, ?, ?)
-        """;
-
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-
-            ps.setInt(1, idRicetta);
-            ps.setInt(2, idIngrediente);
-            ps.setDouble(3, quantita);
-
-            ps.executeUpdate();
-        }
-    }
     
     public List<Ingrediente> findByRicetta(int idRicetta) throws SQLException {
 

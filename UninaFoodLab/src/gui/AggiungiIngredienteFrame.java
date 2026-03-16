@@ -59,35 +59,37 @@ public class AggiungiIngredienteFrame extends JFrame {
 		
 		JLabel lblIngrediente = new JLabel("Nome");
 		lblIngrediente.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblIngrediente.setBounds(30, 108, 74, 25);
+        lblIngrediente.setBounds(101, 110, 74, 25);
         contentPane.add(lblIngrediente);
 
 
         JLabel lblQuantita = new JLabel("Quantità");
         lblQuantita.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblQuantita.setBounds(30, 143, 100, 25);
+        lblQuantita.setBounds(101, 145, 100, 25);
         contentPane.add(lblQuantita);
 
         JTextField txtQuantita = new JTextField();
-        txtQuantita.setBounds(180, 145, 100, 25);
+        txtQuantita.setBounds(224, 145, 100, 25);
         contentPane.add(txtQuantita);
 
         JLabel lblUnita = new JLabel("Unità misura");
         lblUnita.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblUnita.setBounds(30, 178, 100, 25);
+        lblUnita.setBounds(101, 178, 100, 25);
         contentPane.add(lblUnita);
 
-        JTextField txtUnita = new JTextField();
-        txtUnita.setBounds(180, 180, 100, 25);
-        contentPane.add(txtUnita);
+        String[] unitaDisponibili = {"g","kg","ml","l","pezzi"};
+
+        JComboBox<String> comboUnita = new JComboBox<>(unitaDisponibili);
+        comboUnita.setBounds(224, 180, 100, 25);
+        contentPane.add(comboUnita);
         
         JLabel lblCalorie = new JLabel("Calorie");
         lblCalorie.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        lblCalorie.setBounds(30, 213, 100, 25);
+        lblCalorie.setBounds(101, 213, 100, 25);
         contentPane.add(lblCalorie);
 
         JTextField textCalorie = new JTextField();
-        textCalorie.setBounds(180, 215, 100, 25);
+        textCalorie.setBounds(224, 215, 100, 25);
         contentPane.add(textCalorie);
 
         JButton btnAggiungi = new JButton("Aggiungi");
@@ -97,7 +99,7 @@ public class AggiungiIngredienteFrame extends JFrame {
         contentPane.add(btnAggiungi);
         
         textNome = new JTextField();
-        textNome.setBounds(180, 110, 100, 25);
+        textNome.setBounds(224, 110, 100, 25);
         contentPane.add(textNome);
 
         btnAggiungi.addActionListener(e -> {
@@ -130,8 +132,15 @@ public class AggiungiIngredienteFrame extends JFrame {
                 } catch(EntityNotFoundException ex) {
                     idIngrediente = theController.creaIngrediente(nomeIngrediente, "", java.time.LocalDate.now().plusYears(1), calorie);
                 }
+                
+                String unita = (String) comboUnita.getSelectedItem();
+                
+                if(unita.isEmpty()) {
+                	JOptionPane.showMessageDialog(this, "Inserisci unita di misura");
+                	return;
+                }
 
-                theController.aggiungiIngredienteARicetta(idRicetta, idIngrediente, quantita);
+                theController.aggiungiIngredienteARicetta(idRicetta, idIngrediente, quantita, unita);
                 JOptionPane.showMessageDialog(this, "Ingrediente aggiunto correttamente!");
                 dispose();
 
@@ -143,12 +152,12 @@ public class AggiungiIngredienteFrame extends JFrame {
         ImageIcon icon = new ImageIcon(getClass().getResource("/img/U_F_L_1.png"));
 
         Image img = icon.getImage();
-        Image imgRidimensionata = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        Image imgRidimensionata = img.getScaledInstance(200, 200, Image.SCALE_SMOOTH);
 
         ImageIcon iconRidimensionata = new ImageIcon(imgRidimensionata);
 
         JLabel label = new JLabel(iconRidimensionata);
-        label.setBounds(501, 92, 131, 139);
+        label.setBounds(455, 99, 131, 139);
 
         getContentPane().add(label);
 

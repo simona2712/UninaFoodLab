@@ -10,7 +10,7 @@ public interface RicettaDAO extends GenericDAO<Ricetta> {
     List<Ricetta> findBySessionePratica(int idSessione) throws SQLException;
 	void associaASessionePratica(int idRicetta, int idSessione) throws SQLException;
 	void iscriviSessioneOnline(int idAllievo, int idSessione) throws SQLException;
-	void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita) throws SQLException;
+	void aggiungiIngrediente(int idRicetta, int idIngrediente, double quantita, String unita) throws SQLException;
 	List<Ricetta> findByCorso(int idCorso) throws SQLException;
 	Map<String,Integer> getTopRicetteUsate() throws SQLException;
 	double getMediaRicettePerSessione() throws SQLException;

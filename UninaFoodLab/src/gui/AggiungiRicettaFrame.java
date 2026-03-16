@@ -33,7 +33,7 @@ public class AggiungiRicettaFrame extends JFrame {
 	private JTextField txtDescrizione;
     private JTextField txtDurata;
     private JComboBox<String> comboPrep;
-    private JCheckBox[] checkAllergeni;
+    private JComboBox<String> comboAllergeni;
 
 	private Controller theController;
 	private ChefDashboard chefDashboard;
@@ -102,19 +102,13 @@ public class AggiungiRicettaFrame extends JFrame {
         comboPrep.setBounds(192,158,150,25);
         contentPane.add(comboPrep);
         
-        String[] possibiliAllergeni = {"Glutine", "Lattosio", "Arachidi", "Uova", "Frutta"};
-        checkAllergeni = new JCheckBox[possibiliAllergeni.length];
-        
-        JPanel panelAllergeni = new JPanel(new GridLayout(0, 2));
-        panelAllergeni.setBounds(40,193,452,60);
-        panelAllergeni.setBorder(BorderFactory.createTitledBorder("Allergeni"));
+        String[] allergeni = {"Glutine", "Lattosio", "Arachidi", "Uova", "Frutta"};
 
-        for(int i=0; i<possibiliAllergeni.length; i++){
-            checkAllergeni[i] = new JCheckBox(possibiliAllergeni[i]);
-            panelAllergeni.add(checkAllergeni[i]);
-        }
+        comboAllergeni = new JComboBox<>(allergeni);
+        comboAllergeni.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        comboAllergeni.setBounds(192, 193, 150, 25);
 
-        contentPane.add(panelAllergeni);
+        contentPane.add(comboAllergeni);
 
         JButton btnSalva = new JButton("Salva Ricetta");
         btnSalva.setBackground(new Color(253,171,117));
@@ -135,6 +129,11 @@ public class AggiungiRicettaFrame extends JFrame {
 	     label.setBounds(508, 86, 166, 143);
 
 	     getContentPane().add(label);
+	     
+	     JLabel lblAllergeni = new JLabel("Allergeni:");
+	     lblAllergeni.setFont(new Font("SansSerif", Font.PLAIN, 14));
+	     lblAllergeni.setBounds(40, 191, 144, 25);
+	     contentPane.add(lblAllergeni);
 
         setVisible(true);
 	}
@@ -148,11 +147,8 @@ public class AggiungiRicettaFrame extends JFrame {
             String preparazione = (String)comboPrep.getSelectedItem();
             List<String> allergeniSelezionati = new ArrayList<>();
 
-            for (JCheckBox cb : checkAllergeni) {
-                if (cb.isSelected()) {
-                    allergeniSelezionati.add(cb.getText());
-                }
-            }
+            allergeniSelezionati.add((String) comboAllergeni.getSelectedItem());
+            
             Ricetta r = new Ricetta(0,durata,descrizione,preparazione);
             r.setPreparazione(preparazione);
             r.setAllergeni(allergeniSelezionati);
@@ -170,6 +166,4 @@ public class AggiungiRicettaFrame extends JFrame {
         }
 
     }
-	
-	
 }
