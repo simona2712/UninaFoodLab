@@ -29,19 +29,15 @@ public class Controller {
     
     private Chef loggedChef;
     
+    /* Costruttore del Controller. Inizializza il controller principale dell'applicazione. */
     public Controller() {
 
     }
-    
-    public static Controller getInstance() {
-        if (istanziato == null) {
-            istanziato = new Controller();
-        }
-        return istanziato;
-    }
-    
+   
     
     //---------------- CHEF ----------------
+    
+    /* Effettua il login di un chef tramite email e password. Salva lo chef autenticato come utente corrente. */
     public Chef loginChef(String email, String password) 
             throws SQLException, ValidationException, EntityNotFoundException {
 
@@ -60,15 +56,15 @@ public class Controller {
         return chef;
     }
     
+    /* Restituisce lo chef attualmente loggato nel sistema. */
     public Chef getLoggedChef() {
         return loggedChef;
     }
     
- // Restituisce tutte le sessioni del chef (sia online che pratiche)
+    /* Restituisce tutte le sessioni (online e pratiche) dello chef loggato, formattate per essere visualizzate nella GUI. */
     public List<Object[]> getSessioniChef() throws SQLException {
         List<Object[]> listaSessioni = new ArrayList<>();
 
-        // Sessioni online
         for (SessioneOnline s : sessioneOnlineDAO.findByChef(loggedChef.getId())) {
             listaSessioni.add(new Object[]{
                 s.getId(),
@@ -79,7 +75,6 @@ public class Controller {
             });
         }
 
-        // Sessioni pratiche
         for (SessionePratica s : sessionePraticaDAO.findByChef(loggedChef.getId())) {
             listaSessioni.add(new Object[]{
                 s.getId(),
@@ -93,21 +88,22 @@ public class Controller {
         return listaSessioni;
     }
     
- // Restituisce sessioni online del chef
+    /* Restituisce tutte le sessioni online associate a uno specifico chef. */
     public List<SessioneOnline> getSessioniOnlineChef(int idChef) throws SQLException {
         return sessioneOnlineDAO.findByChef(idChef);
     }
 
-    // Restituisce sessioni pratiche del chef
+    /* Restituisce tutte le sessioni pratiche associate a uno specifico chef. */
     public List<SessionePratica> getSessioniPraticheChef(int idChef) throws SQLException {
         return sessionePraticaDAO.findByChef(idChef);
     }
 
-    // Restituisce tutte le ricette dei corsi del chef
+    /* Restituisce tutte le ricette presenti nel sistema. */
     public List<Ricetta> getRicetteChef() throws SQLException {
         return ricettaDAO.findAll();
     }
     
+    /* Registra un nuovo chef nel sistema dopo aver validato i dati inseriti. */
     public void registraChef(String nome, String cognome, String telefono,
             String email, String password,
             String specializzazione, int anniEsperienza) throws SQLException, ValidationException {
@@ -133,27 +129,33 @@ public class Controller {
 	}
     
  // ---------------- CORSI ----------------
+    
+    /* Crea un nuovo corso. */
     public void creaCorso(Corso corso) throws SQLException, ValidationException {
         if (corso == null)
             throw new ValidationException("Corso non valido");
         corsoDAO.create(corso);
     }
 
+    /* Restituisce i corsi filtrati per argomento. */
     public List<Corso> filtraCorsiPerArgomento(String argomento) throws SQLException {
         return corsoDAO.findByArgomento(argomento);
     }
     
+    /* Restituisce tutti i corsi associati allo chef loggato. */
     public List<Corso> getCorsiChef() throws SQLException {
         return corsoDAO.findByChef(loggedChef);
     }
-    
+
+    /* Restituisce il numero totale dei corsi presenti nel sistema. */
     public int getNumeroCorsiTotali() throws SQLException {
         return corsoDAO.countCorsiTotali();
     }
-    
    
     
  // ---------------- SESSIONI ONLINE ----------------
+    
+    /* Aggiunge una nuova sessione online dopo aver validato i dati. */
     public void aggiungiSessioneOnline(int id, int durata, LocalDate data, LocalTime ora, 
                                         String link, Corso corso , int max_partecipanti)
             throws SQLException, ValidationException {
@@ -175,6 +177,7 @@ public class Controller {
     }
 
 
+    /* Iscrive un allievo ad una sessione online, controllando duplicati e validità della sessione. */
     public void iscriviASessioneOnline(int idAllievo, int idSessione)
             throws SQLException, EntityNotFoundException, DuplicateEntityException, InvalidOperationException {
 
@@ -187,7 +190,6 @@ public class Controller {
         if (s.getData().isBefore(LocalDate.now()))
             throw new InvalidOperationException("Sessione già passata");
 
-        // Controllo duplicato
         int count = adesioneDAO.countAdesioniByAllievoAndSessioneOnline(idAllievo, idSessione);
         if (count > 0)
             throw new DuplicateEntityException("Allievo già iscritto alla sessione");
@@ -195,6 +197,7 @@ public class Controller {
         adesioneDAO.iscriviSessioneOnline(idAllievo, idSessione);
     }
     
+    /* Restituisce il numero totale di sessioni online e pratiche. */
     public Map<String,Integer> getNumeroSessioniOnlinePratiche() throws SQLException {
 
         Map<String,Integer> result = new HashMap<>();
@@ -210,6 +213,8 @@ public class Controller {
     
     
  // ---------------- SESSIONI PRATICHE ----------------
+    
+    /* Aggiunge una nuova sessione pratica dopo aver validato i dati. */
     public void aggiungiSessionePratica(int id, int durata, LocalDate data, LocalTime ora, 
                                         String laboratorio, String utensili, Corso corso , int max_partecipanti)
             throws SQLException, ValidationException {
@@ -230,12 +235,14 @@ public class Controller {
         sessionePraticaDAO.create(sessionePratica);
     }
 
+    /* Restituisce tutte le sessioni pratiche future. */
     public List<SessionePratica> getSessioniPraticheFuture() throws SQLException {
         return sessionePraticaDAO.findAll().stream()
                 .filter(s -> s.getData().isAfter(LocalDate.now()))
                 .toList();
     }
 
+    /* Associa una ricetta a una sessione pratica, verificando che la sessione non sia già passata. */
     public void associaRicettaASessionePratica(int idRicetta, int idSessione)
             throws SQLException, EntityNotFoundException, InvalidOperationException {
 
@@ -251,6 +258,7 @@ public class Controller {
         ricettaDAO.associaASessionePratica(idRicetta, idSessione);
     }
     
+    /* Restituisce il numero di sessioni pratiche per ciascun corso. */
     public Map<String,Integer> getNumeroSessioniPerCorso() throws SQLException {
 
         Map<String,Integer> result = new HashMap<>();
@@ -267,6 +275,7 @@ public class Controller {
         return result;
     }
     
+    /* Restituisce il numero totale di presenze e assenze. */
     public Map<String,Integer> getPresenzeAssenze() throws SQLException {
 
         Map<String,Integer> result = new HashMap<>();
@@ -280,53 +289,52 @@ public class Controller {
         return result;
     }
     
+    /* Restituisce il numero di partecipanti per ogni sessione pratica. */
     public Map<String,Integer> getPartecipantiPerSessione() throws SQLException {
 
         Map<String,Integer> result = new HashMap<>();
-
         List<SessionePratica> sessioni = sessionePraticaDAO.findAll();
 
         for(SessionePratica s : sessioni) {
-
             int count = adesioneDAO.countBySessione(s.getId());
-
             String nome = "Sessione " + s.getId() + " - " + s.getData();
-
             result.put(nome, count);
         }
-
         return result;
     }
 
-    
 
     // ---------------- NOTIFICHE ----------------
+    
+    /* Crea una nuova notifica nel sistema. */
     public void creaNotifica(Notifica n) throws SQLException, ValidationException {
         if (n == null) throw new ValidationException("Notifica non valida");
         notificaDAO.create(n);
     }
 
+    /* Restituisce tutte le notifiche associate ad uno chef. */
     public List<Notifica> getNotificheChef(int idChef) throws SQLException {
         return notificaDAO.findByChef(idChef);
     }
     
+    /* Invia una notifica associata ad un corso specifico. */
     public void inviaNotificaCorso(Corso corso, String testo) throws SQLException, ValidationException {
         if (corso == null) throw new ValidationException("Seleziona un corso");
         if (testo == null || testo.isBlank()) throw new ValidationException("Testo non valido");
 
-        // crea la notifica associata a quel corso
         Notifica n = new Notifica(0, testo, getLoggedChef(), corso);
         creaNotifica(n);
     }
 
+    /* Invia una notifica generale a tutti gli utenti. */
     public void inviaNotificaATutti(String testo) throws SQLException, ValidationException {
         if (testo == null || testo.isBlank()) throw new ValidationException("Testo non valido");
 
-        // notifica generale, corso = null
         Notifica n = new Notifica(0, testo, getLoggedChef(), null);
         creaNotifica(n);
     }
     
+    /* Restituisce una notifica dato il suo id. */
     public Notifica getNotificaById(int id) throws Exception {
         return notificaDAO.read(id);
     }
@@ -334,6 +342,7 @@ public class Controller {
     
  // ---------------- RICETTE ----------------
 
+    /* Aggiunge un ingrediente ad una ricetta, specializzando la quantià e l'unità di misura. */
     public void aggiungiIngredienteARicetta(int idRicetta, int idIngrediente, double quantita, String unita)
             throws SQLException, EntityNotFoundException, ValidationException {
 
@@ -352,10 +361,12 @@ public class Controller {
         ricettaDAO.aggiungiIngrediente(idRicetta, idIngrediente, quantita, unita);
     }
     
+    /* Restituisce le ricette più utilizzate nelle sessioni. */
     public Map<String,Integer> getTopRicetteUsate() throws SQLException {
         return ricettaDAO.getTopRicetteUsate();
     }
-    
+
+    /* Restituisce statistiche sulle ricette per sessione (media, massimo, minimo). */
     public Map<String,Double> getStatisticheRicetteSessione() throws SQLException {
 
         Map<String,Double> result = new HashMap<>();
@@ -367,12 +378,15 @@ public class Controller {
         return result;
     }
     
+    /* Aggiunge una nuova ricetta al sistema. */
     public void aggiungiRicetta(Ricetta r) throws Exception {
         ricettaDAO.create(r);
     }
     
     
  // ---------------- ALLIEVO ---------------- 
+    
+    /* Registra un nuovo allievo nel sistema dopo aver validato i dati. */
     public void registraAllievo(String nome, String cognome, String telefono,
             String email, String password, String livelloAbilita) throws SQLException, ValidationException {
 
@@ -394,16 +408,18 @@ public class Controller {
 	}
     
     // ---------------- INGREDIENTE ----------------
+    
+    /* Restituisce l'id di un ingrediente dato il nome. */
     public int getIngredienteByName(String nome) throws SQLException, EntityNotFoundException {
         List<Ingrediente> lista = ingredienteDAO.findByNome(nome);
 
         if (lista.isEmpty()) {
             throw new EntityNotFoundException("Ingrediente non trovato: " + nome);
         }
-
         return lista.get(0).getId();
     }
     
+    /* Crea un nuovo ingrediente nel sistema. */
     public int creaIngrediente(String nome, String tipologia, java.time.LocalDate scadenza, double calorie) 
             throws SQLException, ValidationException {
 
