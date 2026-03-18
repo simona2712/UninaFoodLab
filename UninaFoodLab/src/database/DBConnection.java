@@ -8,7 +8,7 @@ public class DBConnection {
     private DBConnection() {}
 
     public static synchronized Connection getConnection() throws SQLException {
-        // Se la connessione non esiste o è stata chiusa, la riapriamo
+
         if (connection == null || connection.isClosed()) {
             String url = "jdbc:postgresql://localhost:5432/uninafoodlab";
             String user = "postgres";
@@ -25,7 +25,7 @@ public class DBConnection {
         return connection;
     }
 
-    // Metodo da chiamare SOLO quando chiudi definitivamente l'app
+
     public static void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {

@@ -7,23 +7,23 @@ public class Chef extends Utente{
 
     private String specializzazione;
     private int anniEsperienza;
-    private List<Corso> corsi;
-    private List<Notifica> notifiche;
+    private List<Corso> listacorsi;
+    private List<Notifica> listanotifiche;
 
     public Chef(int id, String nome, String cognome, String numeroTelefono, String email, String password, String specializzazione, int anniEsperienza) {
         super(id, nome, cognome, numeroTelefono, email, password);
         this.specializzazione = specializzazione;
         this.anniEsperienza = anniEsperienza;
-        this.corsi = new ArrayList<>();
-        this.notifiche = new ArrayList<>();
+        this.listacorsi = new ArrayList<>();
+        this.listanotifiche = new ArrayList<>();
     }
 
     public List<Corso> getCorsi() { 
-        return corsi; 
+        return listacorsi; 
     }
     
     public void setCorsi(List<Corso> corsi) { 
-    	this.corsi = corsi; 
+    	this.listacorsi = corsi; 
     }
 
     public String getSpecializzazione() { 
@@ -43,31 +43,30 @@ public class Chef extends Utente{
     }
 
     public void aggiungiCorso(Corso corso) {
-        if (!corsi.contains(corso)) {
-            corsi.add(corso);
+        if (!listacorsi.contains(corso)) {
+            listacorsi.add(corso);
             corso.setChef(this);
         }
     }
 
     public void inserisciNotifica(Notifica n) {
-        notifiche.add(n);
+        listanotifiche.add(n);
     }
 
     public void rimuoviCorso(Corso corso) {
-        corsi.remove(corso);
+        listacorsi.remove(corso);
     }
 
     public void rimuoviNotifica(Notifica n) {
-        notifiche.remove(n);
+        listanotifiche.remove(n);
     }
    
-
     public List<Notifica> getNotifiche() {
-        return notifiche;
+        return listanotifiche;
     }
     
     public void setNotifiche(List<Notifica> notifiche) { 
-    	this.notifiche = notifiche; 
+    	this.listanotifiche = notifiche; 
     }
 
     @Override

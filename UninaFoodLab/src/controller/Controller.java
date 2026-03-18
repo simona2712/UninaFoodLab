@@ -16,7 +16,6 @@ import exceptions.*;
 
 public class Controller {
 	
-	private static Controller istanziato = null;
 	private ChefDAO chefDAO = new ChefImpl();
     private AllievoDAO allievoDAO = new AllievoImpl();
     private CorsoDAO corsoDAO = new CorsoImpl();
@@ -420,7 +419,7 @@ public class Controller {
     }
     
     /* Crea un nuovo ingrediente nel sistema. */
-    public int creaIngrediente(String nome, String tipologia, java.time.LocalDate scadenza, double calorie) 
+    public int creaIngrediente(String nome, String tipologia, LocalDate scadenza, double calorie) 
             throws SQLException, ValidationException {
 
         if (nome == null || nome.isBlank()) 

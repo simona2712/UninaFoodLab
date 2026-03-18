@@ -1,9 +1,6 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -25,27 +22,22 @@ import entity.Corso;
 import exceptions.ValidationException;
 
 import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class AggiungiCorsoFrame extends JFrame {
-
 	private static final long serialVersionUID = 1L;
+
 	private JPanel contentPane;
 	
 	private Controller theController;
-	private JTextField txtCategoria;
-	private JTextField txtDataInizio;
 	private JComboBox<String> comboBoxFrequenza;
-	private JTextField txtNumSessioni;
 	private JTextField textFieldArgomento;
 	private JTextField textFieldDataInizio;
 	private JLabel lblNumeroSessioni;
 	private JTextField textFieldNumeroSessioni;
 	private JLabel lblNome;
 	private JTextField textFieldNome;
-	private Chef loggedChef;
 	
+	private Chef loggedChef;
 	private ChefDashboard dashboard;
 	
 	/**

@@ -8,7 +8,9 @@ import entity.Notifica;
 
 public class NotificaDettaglioFrame extends JFrame {
 
-    public NotificaDettaglioFrame(Controller controller, int idNotifica) {
+	private static final long serialVersionUID = 1L;
+
+	public NotificaDettaglioFrame(Controller controller, int idNotifica) {
 
         setTitle("Dettaglio Notifica");
         setResizable(false);

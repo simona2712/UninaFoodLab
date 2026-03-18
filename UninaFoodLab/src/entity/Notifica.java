@@ -8,7 +8,7 @@ public class Notifica {
     private String testo;
     private LocalDate dataCreazione;
     private Chef chef;
-    private Corso corso; // può essere null
+    private Corso corso;
 
     public Notifica(int id, String testo, Chef chef, Corso corso) {
         if (testo == null || testo.isBlank())
